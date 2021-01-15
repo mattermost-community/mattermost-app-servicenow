@@ -11,7 +11,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/mattermost/mattermost-plugin-apps/server/apps"
+	"github.com/mattermost/mattermost-plugin-apps/server/api"
 	"github.com/mattermost/mattermost-plugin-apps/server/utils/md"
 )
 
@@ -46,15 +46,19 @@ func NormalizeRemoteBaseURL(mattermostSiteURL, remoteURL string) (string, error)
 	return remoteURL, nil
 }
 
-func WriteCallResponse(w http.ResponseWriter, v apps.CallResponse) {
+func WriteCallResponse(w http.ResponseWriter, v api.CallResponse) {
 	writeJSON(w, v)
 }
 
-func WriteBindings(w http.ResponseWriter, v []*apps.Binding) {
-	writeJSON(w, v)
+func WriteBindings(w http.ResponseWriter, v []*api.Binding) {
+	call := api.CallResponse{
+		Type: api.CallResponseTypeOK,
+		Data: v,
+	}
+	writeJSON(w, call)
 }
 
-func WriteManifest(w http.ResponseWriter, v apps.Manifest) {
+func WriteManifest(w http.ResponseWriter, v api.Manifest) {
 	writeJSON(w, v)
 }
 
@@ -64,17 +68,14 @@ func writeJSON(w http.ResponseWriter, v interface{}) {
 }
 
 func WriteInternalServerError(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
 	WriteCallResponse(w, newCallErrorResponse("An internal error has occurred. Check app server logs for details."))
 }
 
 func WriteBadRequestError(w http.ResponseWriter, err error) {
-	w.Header().Set("Content-Type", "application/json")
 	WriteCallResponse(w, newCallErrorResponse(fmt.Sprintf("Invalid request. Error: %s", err.Error())))
 }
 
 func WriteNotFoundError(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
 	WriteCallResponse(w, newCallErrorResponse("Not found."))
 }
 
@@ -90,16 +91,16 @@ func WriteCallStandardResponse(w http.ResponseWriter, message string) {
 	WriteCallResponse(w, newCallStandardResponse(message))
 }
 
-func newCallStandardResponse(message string) apps.CallResponse {
-	return apps.CallResponse{
-		Type:     apps.CallResponseTypeOK,
+func newCallStandardResponse(message string) api.CallResponse {
+	return api.CallResponse{
+		Type:     api.CallResponseTypeOK,
 		Markdown: md.MD(message),
 	}
 }
 
-func newCallErrorResponse(message string) apps.CallResponse {
-	return apps.CallResponse{
-		Type:  apps.CallResponseTypeError,
-		Error: message,
+func newCallErrorResponse(message string) api.CallResponse {
+	return api.CallResponse{
+		Type:      api.CallResponseTypeError,
+		ErrorText: message,
 	}
 }

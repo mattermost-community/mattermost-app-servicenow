@@ -7,16 +7,16 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/clients/mattermostclient"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
-	"github.com/mattermost/mattermost-plugin-apps/server/apps"
+	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
-func fBindings(w http.ResponseWriter, req *http.Request, claims *apps.JWTClaims, cc *apps.Context) {
-	commands := &apps.Binding{
-		Location: apps.LocationCommand,
-		Bindings: []*apps.Binding{},
+func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
+	commands := &api.Binding{
+		Location: api.LocationCommand,
+		Bindings: []*api.Binding{},
 	}
 
-	connectionCommand := &apps.Binding{
+	connectionCommand := &api.Binding{
 		Location:    constants.LocationConnect,
 		Label:       "connect",
 		Icon:        "",
@@ -26,7 +26,7 @@ func fBindings(w http.ResponseWriter, req *http.Request, claims *apps.JWTClaims,
 	}
 
 	if app.IsUserConnected(claims.ActingUserID) {
-		connectionCommand = &apps.Binding{
+		connectionCommand = &api.Binding{
 			Location:    constants.LocationDisconnect,
 			Label:       "disconnect",
 			Icon:        "",
@@ -40,14 +40,17 @@ func fBindings(w http.ResponseWriter, req *http.Request, claims *apps.JWTClaims,
 
 	user, err := mattermostclient.GetUser(claims.ActingUserID)
 	if err == nil && user.IsSystemAdmin() {
-		commands.Bindings = append(commands.Bindings, &apps.Binding{
+		commands.Bindings = append(commands.Bindings, &api.Binding{
 			Location:    constants.LocationConfigure,
 			Label:       "config",
 			Icon:        "",
 			Hint:        "",
 			Description: "Configure the plugin",
-			Bindings: []*apps.Binding{
+			Bindings: []*api.Binding{
 				{
+					Form: &api.Form{
+						Fields: []*api.Field{},
+					},
 					Location:    constants.LocationConfigureOAuth,
 					Label:       "oauth",
 					Icon:        "",
@@ -59,7 +62,7 @@ func fBindings(w http.ResponseWriter, req *http.Request, claims *apps.JWTClaims,
 		})
 	}
 
-	out := []*apps.Binding{
+	out := []*api.Binding{
 		commands,
 	}
 
@@ -67,9 +70,9 @@ func fBindings(w http.ResponseWriter, req *http.Request, claims *apps.JWTClaims,
 		tableBindings := app.GetTablesBindings()
 		if tableBindings != nil {
 			tableBindings = generateTableBindingsCalls(tableBindings)
-			out = append(out, &apps.Binding{
-				Location: apps.LocationPostMenu,
-				Bindings: []*apps.Binding{tableBindings},
+			out = append(out, &api.Binding{
+				Location: api.LocationPostMenu,
+				Bindings: []*api.Binding{tableBindings},
 			})
 		}
 	}
@@ -77,7 +80,7 @@ func fBindings(w http.ResponseWriter, req *http.Request, claims *apps.JWTClaims,
 	utils.WriteBindings(w, out)
 }
 
-func generateTableBindingsCalls(b *apps.Binding) *apps.Binding {
+func generateTableBindingsCalls(b *api.Binding) *api.Binding {
 	if len(b.Bindings) == 0 {
 		b.Call = getCreateTicketCall(b.Call.URL)
 	}

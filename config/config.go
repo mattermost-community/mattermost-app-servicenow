@@ -67,6 +67,9 @@ func SetMattermostConfig(v MattermostConfig) {
 
 func Load() {
 	dat, err := store.LoadConfig()
+	if err != nil {
+		return
+	}
 	err = json.Unmarshal(dat, &c)
 	if err != nil {
 		return
@@ -78,5 +81,5 @@ func save() {
 	if err != nil {
 		return
 	}
-	err = store.StoreConfig(dat)
+	_ = store.StoreConfig(dat)
 }

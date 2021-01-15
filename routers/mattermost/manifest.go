@@ -5,7 +5,7 @@ import (
 
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
-	"github.com/mattermost/mattermost-plugin-apps/server/apps"
+	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
 const (
@@ -14,14 +14,16 @@ const (
 )
 
 func fManifest(w http.ResponseWriter, r *http.Request) {
-	manifest := apps.Manifest{
+	manifest := api.Manifest{
 		AppID:       "com.mattermost.servicenow",
 		DisplayName: displayName,
 		Description: description,
-		RootURL:     config.BaseURL(),
-		RequestedLocations: apps.Locations{
-			apps.LocationPostMenu,
-			apps.LocationCommand,
+		HTTPRootURL: config.BaseURL(),
+		HomepageURL: config.BaseURL(),
+		Type:        api.AppTypeHTTP,
+		RequestedLocations: api.Locations{
+			api.LocationPostMenu,
+			api.LocationCommand,
 		},
 	}
 

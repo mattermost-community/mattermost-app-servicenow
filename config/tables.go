@@ -1,13 +1,13 @@
 package config
 
-import "github.com/mattermost/mattermost-plugin-apps/server/apps"
+import "github.com/mattermost/mattermost-plugin-apps/server/api"
 
-type TablesConfig = map[string]TableConfig
+type TablesConfig map[string]TableConfig
 
-type TableConfig = struct {
+type TableConfig struct {
 	ID          string
 	DisplayName string
-	Fields      []*apps.Field
+	Fields      []*api.Field
 	Ticketable  bool
 	PostDefault string
 }

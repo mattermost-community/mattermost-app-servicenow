@@ -1,13 +1,12 @@
 package mattermost
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
-	"github.com/mattermost/mattermost-plugin-apps/server/apps"
+	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
 const (
@@ -16,7 +15,7 @@ const (
 	configureOAuthServiceNowInstanceValue = "instance"
 )
 
-func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *apps.JWTClaims, c *apps.Call) {
+func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
 	if !c.Context.ExpandedContext.ActingUser.IsSystemAdmin() {
 		utils.WriteCallErrorResponse(w, "You must be a system admin to configure oauth.")
 		return
@@ -35,27 +34,27 @@ func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *apps.JWTCla
 
 	conf := config.OAuth()
 
-	utils.WriteCallResponse(w, apps.CallResponse{
-		Type: apps.CallResponseTypeForm,
-		Form: &apps.Form{
+	utils.WriteCallResponse(w, api.CallResponse{
+		Type: api.CallResponseTypeForm,
+		Form: &api.Form{
 			Title: "Configure OAuth",
-			Fields: []*apps.Field{
+			Fields: []*api.Field{
 				{
 					Name:       configureOAuthServiceNowInstanceValue,
 					ModalLabel: "Service Now Instance",
-					Type:       apps.FieldTypeText,
+					Type:       api.FieldTypeText,
 					Value:      config.ServiceNowInstance(),
 				},
 				{
 					Name:       configureOAuthClientIDValue,
 					ModalLabel: "Client ID",
-					Type:       apps.FieldTypeText,
+					Type:       api.FieldTypeText,
 					Value:      conf.ClientID,
 				},
 				{
 					Name:        configureOAuthClientSecretValue,
 					ModalLabel:  "Client Secret",
-					Type:        apps.FieldTypeText,
+					Type:        api.FieldTypeText,
 					TextSubtype: "password",
 					Value:       conf.ClientSecret,
 				},
@@ -65,9 +64,10 @@ func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *apps.JWTCla
 	})
 }
 
-func getConfigureOAuthCall() *apps.Call {
-	return &apps.Call{
-		URL:    fmt.Sprintf("%s%s", config.BaseURL(), constants.BindingPathConfigureOAuth),
-		Expand: &apps.Expand{ActingUser: apps.ExpandAll},
+func getConfigureOAuthCall() *api.Call {
+	return &api.Call{
+		Type:   api.CallTypeSubmit,
+		URL:    constants.BindingPathConfigureOAuth,
+		Expand: &api.Expand{ActingUser: api.ExpandAll},
 	}
 }

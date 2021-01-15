@@ -9,17 +9,16 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
-	"github.com/mattermost/mattermost-plugin-apps/server/apps"
+	"github.com/mattermost/mattermost-plugin-apps/server/api"
 	"github.com/pkg/errors"
 )
 
-type callHandler func(http.ResponseWriter, *http.Request, *apps.JWTClaims, *apps.Call)
-type contextHandler func(http.ResponseWriter, *http.Request, *apps.JWTClaims, *apps.Context)
+type callHandler func(http.ResponseWriter, *http.Request, *api.JWTClaims, *api.Call)
 
 func Init(router *mux.Router) {
 	router.HandleFunc(constants.ManifestPath, fManifest)
 	router.HandleFunc(constants.InstallPath, extractCall(fInstall))
-	router.HandleFunc(constants.BindingsPath, handleGetWithContext(fBindings))
+	router.HandleFunc(constants.BindingsPath, extractCall(fBindings))
 
 	router.HandleFunc(constants.BindingPathCreate, extractCall(fCreateTicket))
 	router.HandleFunc(constants.BindingPathConnect, extractCall(fConnect))
@@ -35,7 +34,7 @@ func extractCall(f callHandler) http.HandlerFunc {
 			return
 		}
 
-		data, err := apps.UnmarshalCallFromReader(r.Body)
+		data, err := api.UnmarshalCallFromReader(r.Body)
 		if err != nil {
 			utils.WriteBadRequestError(rw, err)
 			return
@@ -45,31 +44,14 @@ func extractCall(f callHandler) http.HandlerFunc {
 	}
 }
 
-func handleGetWithContext(f contextHandler) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		claims, err := checkJWT(req)
-		if err != nil {
-			utils.WriteBadRequestError(w, err)
-			return
-		}
-
-		f(w, req, claims, &apps.Context{
-			TeamID:       req.Form.Get(apps.PropTeamID),
-			ChannelID:    req.Form.Get(apps.PropChannelID),
-			ActingUserID: req.Form.Get(apps.PropActingUserID),
-			PostID:       req.Form.Get(apps.PropPostID),
-		})
-	}
-}
-
-func checkJWT(req *http.Request) (*apps.JWTClaims, error) {
-	authValue := req.Header.Get(apps.OutgoingAuthHeader)
+func checkJWT(req *http.Request) (*api.JWTClaims, error) {
+	authValue := req.Header.Get(api.OutgoingAuthHeader)
 	if !strings.HasPrefix(authValue, "Bearer ") {
-		return nil, errors.Errorf("missing %s: Bearer header", apps.OutgoingAuthHeader)
+		return nil, errors.Errorf("missing %s: Bearer header", api.OutgoingAuthHeader)
 	}
 
 	jwtoken := strings.TrimPrefix(authValue, "Bearer ")
-	claims := apps.JWTClaims{}
+	claims := api.JWTClaims{}
 	_, err := jwt.ParseWithClaims(jwtoken, &claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

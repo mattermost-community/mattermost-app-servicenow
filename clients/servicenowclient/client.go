@@ -29,7 +29,7 @@ func NewClient(userID string) *Client {
 }
 
 func (c *Client) CreateIncident(table string, v interface{}) error {
-	url := fmt.Sprintf("%s/%s/%s", config.ServiceNowInstance(), "/api/now/table/", table)
+	url := fmt.Sprintf("%s%s/%s", config.ServiceNowInstance(), "/api/now/table", table)
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err

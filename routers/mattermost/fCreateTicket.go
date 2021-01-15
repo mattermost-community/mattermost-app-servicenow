@@ -8,10 +8,10 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
-	"github.com/mattermost/mattermost-plugin-apps/server/apps"
+	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
-func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *apps.JWTClaims, c *apps.Call) {
+func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
 	table := r.URL.Query().Get(constants.TableIDGetField)
 	if len(c.Values) > 0 {
 		err := submitTicket(claims.ActingUserID, table, c)
@@ -34,7 +34,7 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *apps.JWTClaim
 		postField = c.Context.ExpandedContext.Post.Message
 	}
 
-	fields := []*apps.Field{}
+	fields := []*api.Field{}
 	for _, v := range t.Fields {
 		field := *v
 		if t.PostDefault == v.Name {
@@ -43,9 +43,9 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *apps.JWTClaim
 		fields = append(fields, &field)
 	}
 
-	utils.WriteCallResponse(w, apps.CallResponse{
-		Type: apps.CallResponseTypeForm,
-		Form: &apps.Form{
+	utils.WriteCallResponse(w, api.CallResponse{
+		Type: api.CallResponseTypeForm,
+		Form: &api.Form{
 			Title:  "Create ticket",
 			Fields: fields,
 		},
@@ -53,7 +53,7 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *apps.JWTClaim
 	})
 }
 
-func submitTicket(userID, table string, call *apps.Call) error {
+func submitTicket(userID, table string, call *api.Call) error {
 	c := servicenowclient.NewClient(userID)
 	if c == nil {
 		return fmt.Errorf("cannot create client")
@@ -61,9 +61,9 @@ func submitTicket(userID, table string, call *apps.Call) error {
 	return c.CreateIncident(table, call.Values)
 }
 
-func getCreateTicketCall(table string) *apps.Call {
-	return &apps.Call{
-		URL:    fmt.Sprintf("%s%s?%s=%s", config.BaseURL(), constants.BindingPathCreate, constants.TableIDGetField, table),
-		Expand: &apps.Expand{Post: apps.ExpandAll},
+func getCreateTicketCall(table string) *api.Call {
+	return &api.Call{
+		URL:    fmt.Sprintf("%s?%s=%s", constants.BindingPathCreate, constants.TableIDGetField, table),
+		Expand: &api.Expand{Post: api.ExpandAll},
 	}
 }

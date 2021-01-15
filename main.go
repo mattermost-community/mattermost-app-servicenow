@@ -9,7 +9,7 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/routers/mattermost"
 	"github.com/mattermost/mattermost-app-servicenow/routers/oauth"
 	"github.com/mattermost/mattermost-app-servicenow/store"
-	"github.com/mattermost/mattermost-plugin-apps/server/apps"
+	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
 func main() {
@@ -27,16 +27,16 @@ func main() {
 	config.AddTable(config.TableConfig{
 		ID:          "incidents",
 		DisplayName: "Incidents",
-		Fields: []*apps.Field{
+		Fields: []*api.Field{
 			{
 				Name:       "short_description",
 				ModalLabel: "Short Description",
-				Type:       apps.FieldTypeText,
+				Type:       api.FieldTypeText,
 			},
 			{
 				Name:       "description",
 				ModalLabel: "Long Description",
-				Type:       apps.FieldTypeText,
+				Type:       api.FieldTypeText,
 			},
 		},
 		Ticketable:  true,
@@ -44,5 +44,5 @@ func main() {
 	})
 
 	http.Handle("/", r)
-	http.ListenAndServe(":3000", nil)
+	_ = http.ListenAndServe(":3000", nil)
 }

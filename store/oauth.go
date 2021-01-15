@@ -16,10 +16,8 @@ func init() {
 	ticker := time.NewTicker(constants.OAuthStateGCTicker)
 	go func() {
 		for {
-			select {
-			case <-ticker.C:
-				gcStates()
-			}
+			<-ticker.C
+			gcStates()
 		}
 	}()
 }

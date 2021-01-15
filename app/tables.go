@@ -3,32 +3,32 @@ package app
 import (
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
-	"github.com/mattermost/mattermost-plugin-apps/server/apps"
+	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
-func GetTablesBindings() *apps.Binding {
+func GetTablesBindings() *api.Binding {
 	tt := filterTicketable(config.GetTables())
-	out := &apps.Binding{
+	out := &api.Binding{
 		Location: constants.BindingPathCreate,
 		Label:    "Create ticket",
-		Bindings: []*apps.Binding{},
+		Bindings: []*api.Binding{},
 	}
 	switch len(tt) {
 	case 0:
 		return nil
 	case 1:
 		for _, t := range tt {
-			out.Call = &apps.Call{
+			out.Call = &api.Call{
 				URL: t.ID,
 			}
 			return out
 		}
 	}
 	for _, t := range tt {
-		out.Bindings = append(out.Bindings, &apps.Binding{
-			Location: apps.Location(t.ID),
+		out.Bindings = append(out.Bindings, &api.Binding{
+			Location: api.Location(t.ID),
 			Label:    t.DisplayName,
-			Call: &apps.Call{
+			Call: &api.Call{
 				URL: t.ID,
 			},
 		})
