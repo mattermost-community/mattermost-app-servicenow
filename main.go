@@ -24,6 +24,11 @@ func main() {
 		config.SetBaseURL(os.Args[1])
 	}
 
+	addr := ":3000"
+	if len(os.Args) > 2 {
+		addr = os.Args[2]
+	}
+
 	config.AddTable(config.TableConfig{
 		ID:          "incidents",
 		DisplayName: "Incidents",
@@ -44,5 +49,5 @@ func main() {
 	})
 
 	http.Handle("/", r)
-	_ = http.ListenAndServe(":3000", nil)
+	_ = http.ListenAndServe(addr, nil)
 }
