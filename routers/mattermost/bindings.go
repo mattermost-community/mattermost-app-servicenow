@@ -48,15 +48,12 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 			Description: "Configure the plugin",
 			Bindings: []*api.Binding{
 				{
-					Form: &api.Form{
-						Fields: []*api.Field{},
-					},
 					Location:    constants.LocationConfigureOAuth,
 					Label:       "oauth",
 					Icon:        "",
 					Hint:        "",
 					Description: "Configure OAuth options",
-					Call:        getConfigureOAuthCall(),
+					Call:        getConfigureOAuthCall(configureOAuthActionOpen),
 				},
 			},
 		})
