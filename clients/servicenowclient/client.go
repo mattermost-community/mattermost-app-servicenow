@@ -10,6 +10,7 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/store"
+	"github.com/pkg/errors"
 )
 
 type Client struct {
@@ -28,21 +29,27 @@ func NewClient(userID string) *Client {
 	}
 }
 
-func (c *Client) CreateIncident(table string, v interface{}) error {
+func (c *Client) CreateIncident(table string, v interface{}) (string, error) {
 	url := fmt.Sprintf("%s%s/%s", config.ServiceNowInstance(), "/api/now/table", table)
 	b, err := json.Marshal(v)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	resp, err := c.client.Post(url, "application/json", bytes.NewReader(b))
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if resp.StatusCode != 201 {
-		return fmt.Errorf("call returned with status %v", resp.Status)
+		return "", fmt.Errorf("call returned with status %v", resp.Status)
 	}
 
-	return nil
+	var ticket CreateTicketResponse
+	err = json.NewDecoder(resp.Body).Decode(&ticket)
+	if err != nil {
+		return "", errors.Wrap(err, "could not decode create ticket response")
+	}
+
+	return ticket.Result.ID, nil
 }

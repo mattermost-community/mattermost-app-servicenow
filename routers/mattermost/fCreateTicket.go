@@ -14,13 +14,13 @@ import (
 func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
 	table := r.URL.Query().Get(constants.TableIDGetField)
 	if len(c.Values) > 0 {
-		err := submitTicket(claims.ActingUserID, table, c)
+		id, err := submitTicket(claims.ActingUserID, table, c)
 		if err != nil {
 			utils.WriteCallErrorResponse(w, fmt.Sprintf("Could not create the ticket. Are you connected to Service Now? Error: %s", err.Error()))
 			return
 		}
 
-		utils.WriteCallStandardResponse(w, "Ticket created")
+		utils.WriteCallStandardResponse(w, fmt.Sprintf("Ticket created with sys_id %s.", id))
 		return
 	}
 
@@ -53,10 +53,10 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims
 	})
 }
 
-func submitTicket(userID, table string, call *api.Call) error {
+func submitTicket(userID, table string, call *api.Call) (string, error) {
 	c := servicenowclient.NewClient(userID)
 	if c == nil {
-		return fmt.Errorf("cannot create client")
+		return "", fmt.Errorf("cannot create client")
 	}
 	return c.CreateIncident(table, call.Values)
 }
