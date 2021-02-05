@@ -1,5 +1,9 @@
-SITE?=http://localhost:3000
+BASE?=http://localhost:3000
 ADDR?=:3000
+
+.PHONY: all
+## all: builds and runs the service
+all: build run
 
 .PHONY: build
 ## build: build the executable
@@ -9,11 +13,7 @@ build:
 .PHONY: run
 ## run: runs the service
 run:
-	./bin/mattermost-apps-servicenow ${SITE} ${ADDR}
-
-.PHONY: all
-## all: builds and runs the service
-all: build run
+	./bin/mattermost-apps-servicenow ${BASE} ${ADDR}
 
 .PHONY: help
 ## help: prints this help message
