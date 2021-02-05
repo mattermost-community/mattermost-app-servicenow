@@ -22,6 +22,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 		Icon:        "",
 		Hint:        "",
 		Description: "Connect your ServiceNow account",
+		Form:        &api.Form{},
 		Call:        getConnectCall(),
 	}
 
@@ -32,6 +33,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 			Icon:        "",
 			Hint:        "",
 			Description: "Disconnect from ServiceNow",
+			Form:        &api.Form{},
 			Call:        getDisconnectCall(),
 		}
 	}
@@ -53,37 +55,45 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 					Icon:        "",
 					Hint:        "",
 					Description: "Configure OAuth options",
-					Call:        getConfigureOAuthCall(configureOAuthActionOpen),
+					Call:        getConfigureOAuthCall(formActionOpen),
 				},
 			},
 		})
 	}
 
-	out := []*api.Binding{
-		commands,
-	}
+	out := []*api.Binding{}
 
 	if app.IsUserConnected(claims.ActingUserID) {
-		tableBindings := app.GetTablesBindings()
-		if tableBindings != nil {
-			tableBindings = generateTableBindingsCalls(tableBindings)
+		postBindings, commandBindings, headerBindings := app.GetTablesBindings()
+		if postBindings != nil {
 			out = append(out, &api.Binding{
 				Location: api.LocationPostMenu,
-				Bindings: []*api.Binding{tableBindings},
+				Bindings: []*api.Binding{generateTableBindingsCalls(postBindings)},
+			})
+		}
+		if commandBindings != nil {
+			commands.Bindings = append(commands.Bindings, generateTableBindingsCalls(commandBindings))
+		}
+		if headerBindings != nil {
+			out = append(out, &api.Binding{
+				Location: api.LocationChannelHeader,
+				Bindings: []*api.Binding{generateTableBindingsCalls(headerBindings)},
 			})
 		}
 	}
+
+	out = append(out, commands)
 
 	utils.WriteBindings(w, out)
 }
 
 func generateTableBindingsCalls(b *api.Binding) *api.Binding {
 	if len(b.Bindings) == 0 {
-		b.Call = getCreateTicketCall(b.Call.URL)
+		b.Call = getCreateTicketCall(b.Call.URL, formActionOpen)
 	}
 
 	for _, subBinding := range b.Bindings {
-		subBinding.Call = getCreateTicketCall(subBinding.Call.URL)
+		subBinding.Call = getCreateTicketCall(subBinding.Call.URL, formActionOpen)
 	}
 
 	return b

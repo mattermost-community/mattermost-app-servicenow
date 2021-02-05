@@ -44,7 +44,9 @@ func main() {
 				Type:       api.FieldTypeText,
 			},
 		},
-		Ticketable:  true,
+		Post:        true,
+		Command:     true,
+		Header:      true,
 		PostDefault: "short_description",
 	})
 

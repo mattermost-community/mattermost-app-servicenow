@@ -6,44 +6,68 @@ import (
 	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
-func GetTablesBindings() *api.Binding {
-	tt := filterTicketable(config.GetTables())
-	out := &api.Binding{
+func GetTablesBindings() (post, command, header *api.Binding) {
+	pt, ct, ht := filterTables(config.GetTables())
+	pb := baseBinding("Create Ticket")
+	cb := baseBinding("create-ticket")
+	hb := baseBinding("Create Ticket")
+	post = subBindings(pt, pb, false)
+	command = subBindings(ct, cb, true)
+	header = subBindings(ht, hb, false)
+	return
+}
+
+func baseBinding(label string) *api.Binding {
+	return &api.Binding{
 		Location: constants.BindingPathCreate,
-		Label:    "Create ticket",
+		Label:    label,
 		Bindings: []*api.Binding{},
 	}
+}
+
+func subBindings(tt config.TablesConfig, base *api.Binding, useLocationLabel bool) *api.Binding {
 	switch len(tt) {
 	case 0:
 		return nil
 	case 1:
 		for _, t := range tt {
-			out.Call = &api.Call{
+			base.Call = &api.Call{
 				URL: t.ID,
 			}
-			return out
+			return base
 		}
 	}
 	for _, t := range tt {
-		out.Bindings = append(out.Bindings, &api.Binding{
+		label := t.DisplayName
+		if useLocationLabel {
+			label = t.ID
+		}
+		base.Bindings = append(base.Bindings, &api.Binding{
 			Location: api.Location(t.ID),
-			Label:    t.DisplayName,
+			Label:    label,
 			Call: &api.Call{
 				URL: t.ID,
 			},
 		})
 	}
 
-	return out
+	return base
 }
 
-func filterTicketable(tt config.TablesConfig) config.TablesConfig {
-	out := config.TablesConfig{}
+func filterTables(tt config.TablesConfig) (post, command, header config.TablesConfig) {
+	post = config.TablesConfig{}
+	command = config.TablesConfig{}
+	header = config.TablesConfig{}
 	for _, t := range tt {
-		if t.Ticketable {
-			out[t.ID] = t
+		if t.Post {
+			post[t.ID] = t
+		}
+		if t.Command {
+			command[t.ID] = t
+		}
+		if t.Header {
+			header[t.ID] = t
 		}
 	}
-
-	return out
+	return
 }

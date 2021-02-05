@@ -8,7 +8,9 @@ type TableConfig struct {
 	ID          string
 	DisplayName string
 	Fields      []*api.Field
-	Ticketable  bool
+	Post        bool
+	Command     bool
+	Header      bool
 	PostDefault string
 }
 

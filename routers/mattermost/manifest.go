@@ -24,6 +24,7 @@ func fManifest(w http.ResponseWriter, r *http.Request) {
 		RequestedLocations: api.Locations{
 			api.LocationPostMenu,
 			api.LocationCommand,
+			api.LocationChannelHeader,
 		},
 	}
 

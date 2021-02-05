@@ -14,31 +14,25 @@ const (
 	configureOAuthClientIDValue           = "clientID"
 	configureOAuthClientSecretValue       = "clientSecret"
 	configureOAuthServiceNowInstanceValue = "instance"
-
-	configureOAuthActionQueryField = "action"
-	configureOAuthActionSubmit     = "submit"
-	configureOAuthActionOpen       = "open"
 )
 
-type configureOAuthAction string
-
 func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
-	if c.Type == api.CallTypeForm {
-		utils.WriteCallResponse(w, api.CallResponse{
-			Type: api.CallResponseTypeForm,
-			Form: getConfigureOAuthForm(nil),
-			Call: getConfigureOAuthCall(configureOAuthActionOpen),
-		})
-	}
-
 	if !c.Context.ExpandedContext.ActingUser.IsSystemAdmin() {
 		utils.WriteCallErrorResponse(w, "You must be a system admin to configure oauth.")
 		return
 	}
 
-	action := r.URL.Query().Get(configureOAuthActionQueryField)
+	if c.Type == api.CallTypeForm {
+		utils.WriteCallResponse(w, api.CallResponse{
+			Type: api.CallResponseTypeForm,
+			Form: getConfigureOAuthForm(nil, formActionOpen),
+		})
+		return
+	}
 
-	if len(c.Values) > 0 && action == configureOAuthActionSubmit {
+	action := r.URL.Query().Get(string(formActionQueryField))
+
+	if action == string(formActionSubmit) {
 		config.SetServiceNowInstance(c.GetValue(configureOAuthServiceNowInstanceValue, ""))
 		config.SetOAuthConfig(config.OAuthConfig{
 			ClientID:     c.GetValue(configureOAuthClientIDValue, ""),
@@ -51,12 +45,11 @@ func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *api.JWTClai
 
 	utils.WriteCallResponse(w, api.CallResponse{
 		Type: api.CallResponseTypeForm,
-		Form: getConfigureOAuthForm(c.Values),
-		Call: getConfigureOAuthCall(configureOAuthActionSubmit),
+		Form: getConfigureOAuthForm(c.Values, formActionSubmit),
 	})
 }
 
-func getConfigureOAuthForm(v map[string]interface{}) *api.Form {
+func getConfigureOAuthForm(v map[string]interface{}, action formAction) *api.Form {
 	conf := config.OAuth()
 
 	return &api.Form{
@@ -82,13 +75,13 @@ func getConfigureOAuthForm(v map[string]interface{}) *api.Form {
 				Value:       utils.GetStringFromMapInterface(v, configureOAuthClientSecretValue, conf.ClientSecret),
 			},
 		},
+		Call: getConfigureOAuthCall(action),
 	}
 }
 
-func getConfigureOAuthCall(action configureOAuthAction) *api.Call {
+func getConfigureOAuthCall(action formAction) *api.Call {
 	return &api.Call{
-		Type:   api.CallTypeSubmit,
-		URL:    fmt.Sprintf("%s?%s=%s", constants.BindingPathConfigureOAuth, configureOAuthActionQueryField, action),
+		URL:    fmt.Sprintf("%s?%s=%s", constants.BindingPathConfigureOAuth, formActionQueryField, action),
 		Expand: &api.Expand{ActingUser: api.ExpandAll},
 	}
 }
