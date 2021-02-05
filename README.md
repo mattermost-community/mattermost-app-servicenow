@@ -11,7 +11,7 @@
 
 ## Configuration
 
-1. OAuth must be configured to use ServiceNow. In order to configure ServiceNow side, refer to [ServiceNow documentation](https://docs.servicenow.com/bundle/paris-platform-administration/page/administer/security/task/t_SettingUpOAuth.html).
+1. OAuth must be configured to use ServiceNow. In order to configure ServiceNow side, refer to [ServiceNow documentation](https://docs.servicenow.com/bundle/paris-platform-administration/page/administer/security/task/t_CreateEndpointforExternalClients.html).
 2. For redirect URL please use `BASE/oauth/complete`.
 3. In Mattermost, run the command `/com.mattermost.servicenow configure oauth` and introduce the required fields.
 
