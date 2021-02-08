@@ -98,11 +98,12 @@ func (c *KVClient) newRequest(key string, body io.Reader, method string) (*http.
 
 	req.Header.Set("Authorization", "BEARER"+" "+c.token)
 
+	req.ParseForm()
 	req.Form.Add("prefix", "servicenow")
 
 	return req, nil
 }
 
 func (c *KVClient) getKVURL(key string) string {
-	return c.url + "/com.mattermost.cloudapps/api/v1/kv/" + url.PathEscape(key)
+	return c.url + "/plugins/com.mattermost.apps/api/v1/kv/" + url.PathEscape(key)
 }

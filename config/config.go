@@ -104,7 +104,7 @@ func loadLocal() LocalConfig {
 
 	dat, err := store.LoadLocalConfig()
 	if err != nil {
-		log.Printf("Could not load MM config: %v", err)
+		log.Printf("Could not load local config: %v", err)
 		return defaultLocalConfig
 	}
 
@@ -112,7 +112,7 @@ func loadLocal() LocalConfig {
 
 	err = json.Unmarshal(dat, &c)
 	if err != nil {
-		log.Printf("Could not unmarshall MM config: %v", err)
+		log.Printf("Could not unmarshall local config: %v", err)
 		return defaultLocalConfig
 	}
 
@@ -122,12 +122,12 @@ func loadLocal() LocalConfig {
 func saveLocal(c LocalConfig) {
 	dat, err := json.Marshal(c)
 	if err != nil {
-		log.Printf("Could not marshal MM config: %v", err)
+		log.Printf("Could not marshal local config: %v", err)
 		return
 	}
 
 	err = store.SaveLocalConfig(dat)
 	if err != nil {
-		log.Printf("Could not store MM config: %v", err)
+		log.Printf("Could not store local config: %v", err)
 	}
 }
