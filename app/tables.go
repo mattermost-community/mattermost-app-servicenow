@@ -14,6 +14,7 @@ func GetTablesBindings() (post, command, header *api.Binding) {
 	post = subBindings(pt, pb, false)
 	command = subBindings(ct, cb, true)
 	header = subBindings(ht, hb, false)
+
 	return
 }
 
@@ -34,14 +35,17 @@ func subBindings(tt config.TablesConfig, base *api.Binding, useLocationLabel boo
 			base.Call = &api.Call{
 				URL: t.ID,
 			}
+
 			return base
 		}
 	}
+
 	for _, t := range tt {
 		label := t.DisplayName
 		if useLocationLabel {
 			label = t.ID
 		}
+
 		base.Bindings = append(base.Bindings, &api.Binding{
 			Location: api.Location(t.ID),
 			Label:    label,
@@ -58,16 +62,20 @@ func filterTables(tt config.TablesConfig) (post, command, header config.TablesCo
 	post = config.TablesConfig{}
 	command = config.TablesConfig{}
 	header = config.TablesConfig{}
+
 	for _, t := range tt {
 		if t.Post {
 			post[t.ID] = t
 		}
+
 		if t.Command {
 			command[t.ID] = t
 		}
+
 		if t.Header {
 			header[t.ID] = t
 		}
 	}
+
 	return
 }

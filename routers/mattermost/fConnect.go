@@ -13,8 +13,9 @@ import (
 
 func fConnect(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
 	state := utils.CreateOAuthState(c.Context.ActingUserID, c.Context.ChannelID)
-	store.StoreState(state)
 	conf := app.GetOAuthConfig()
+
+	store.SaveState(c.Context.BotAccessToken, c.Context.MattermostSiteURL, state)
 	utils.WriteCallStandardResponse(w, fmt.Sprintf("Follow this link to connect: [link](%s)", conf.AuthCodeURL(state)))
 }
 

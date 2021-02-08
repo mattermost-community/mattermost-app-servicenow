@@ -16,54 +16,23 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 		Bindings: []*api.Binding{},
 	}
 
-	connectionCommand := &api.Binding{
-		Location:    constants.LocationConnect,
-		Label:       "connect",
-		Icon:        "",
-		Hint:        "",
-		Description: "Connect your ServiceNow account",
-		Form:        &api.Form{},
-		Call:        getConnectCall(),
-	}
+	connectionCommand := getConnectBinding()
 
-	if app.IsUserConnected(claims.ActingUserID) {
-		connectionCommand = &api.Binding{
-			Location:    constants.LocationDisconnect,
-			Label:       "disconnect",
-			Icon:        "",
-			Hint:        "",
-			Description: "Disconnect from ServiceNow",
-			Form:        &api.Form{},
-			Call:        getDisconnectCall(),
-		}
+	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, claims.ActingUserID) {
+		connectionCommand = getDisconnectBinding()
 	}
 
 	commands.Bindings = append(commands.Bindings, connectionCommand)
+	client := mattermostclient.NewMMClient(c.Context.BotUserID, c.Context.BotAccessToken, c.Context.MattermostSiteURL)
 
-	user, err := mattermostclient.GetUser(claims.ActingUserID)
+	user, err := client.GetUser(claims.ActingUserID)
 	if err == nil && user.IsSystemAdmin() {
-		commands.Bindings = append(commands.Bindings, &api.Binding{
-			Location:    constants.LocationConfigure,
-			Label:       "config",
-			Icon:        "",
-			Hint:        "",
-			Description: "Configure the plugin",
-			Bindings: []*api.Binding{
-				{
-					Location:    constants.LocationConfigureOAuth,
-					Label:       "oauth",
-					Icon:        "",
-					Hint:        "",
-					Description: "Configure OAuth options",
-					Call:        getConfigureOAuthCall(formActionOpen),
-				},
-			},
-		})
+		commands.Bindings = append(commands.Bindings, getSysAdminCommandBindings())
 	}
 
 	out := []*api.Binding{}
 
-	if app.IsUserConnected(claims.ActingUserID) {
+	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, claims.ActingUserID) {
 		postBindings, commandBindings, headerBindings := app.GetTablesBindings()
 		if postBindings != nil {
 			out = append(out, &api.Binding{
@@ -71,9 +40,11 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 				Bindings: []*api.Binding{generateTableBindingsCalls(postBindings)},
 			})
 		}
+
 		if commandBindings != nil {
 			commands.Bindings = append(commands.Bindings, generateTableBindingsCalls(commandBindings))
 		}
+
 		if headerBindings != nil {
 			out = append(out, &api.Binding{
 				Location: api.LocationChannelHeader,
@@ -97,4 +68,47 @@ func generateTableBindingsCalls(b *api.Binding) *api.Binding {
 	}
 
 	return b
+}
+
+func getSysAdminCommandBindings() *api.Binding {
+	return &api.Binding{
+		Location:    constants.LocationConfigure,
+		Label:       "config",
+		Icon:        "",
+		Hint:        "",
+		Description: "Configure the plugin",
+		Bindings: []*api.Binding{
+			{
+				Location:    constants.LocationConfigureOAuth,
+				Label:       "oauth",
+				Icon:        "",
+				Hint:        "",
+				Description: "Configure OAuth options",
+				Call:        getConfigureOAuthCall(formActionOpen),
+			},
+		},
+	}
+}
+func getConnectBinding() *api.Binding {
+	return &api.Binding{
+		Location:    constants.LocationConnect,
+		Label:       "connect",
+		Icon:        "",
+		Hint:        "",
+		Description: "Connect your ServiceNow account",
+		Form:        &api.Form{},
+		Call:        getConnectCall(),
+	}
+}
+
+func getDisconnectBinding() *api.Binding {
+	return &api.Binding{
+		Location:    constants.LocationDisconnect,
+		Label:       "disconnect",
+		Icon:        "",
+		Hint:        "",
+		Description: "Disconnect from ServiceNow",
+		Form:        &api.Form{},
+		Call:        getDisconnectCall(),
+	}
 }

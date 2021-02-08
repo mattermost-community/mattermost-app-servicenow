@@ -8,47 +8,27 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/routers/mattermost"
 	"github.com/mattermost/mattermost-app-servicenow/routers/oauth"
-	"github.com/mattermost/mattermost-app-servicenow/store"
-	"github.com/mattermost/mattermost-plugin-apps/server/api"
+)
+
+const (
+	baseURLPosition = 1
+	addressPosition = 2
 )
 
 func main() {
+	// Init routers
 	r := mux.NewRouter()
 	mattermost.Init(r)
 	oauth.Init(r)
 
-	store.LoadTokens()
-	config.Load()
-
-	if len(os.Args) > 1 {
-		config.SetBaseURL(os.Args[1])
+	if len(os.Args) > baseURLPosition {
+		config.SetBaseURL(os.Args[baseURLPosition])
 	}
 
 	addr := ":3000"
-	if len(os.Args) > 2 {
-		addr = os.Args[2]
+	if len(os.Args) > addressPosition {
+		addr = os.Args[addressPosition]
 	}
-
-	config.AddTable(config.TableConfig{
-		ID:          "incidents",
-		DisplayName: "Incidents",
-		Fields: []*api.Field{
-			{
-				Name:       "short_description",
-				ModalLabel: "Short Description",
-				Type:       api.FieldTypeText,
-			},
-			{
-				Name:       "description",
-				ModalLabel: "Long Description",
-				Type:       api.FieldTypeText,
-			},
-		},
-		Post:        true,
-		Command:     true,
-		Header:      true,
-		PostDefault: "short_description",
-	})
 
 	http.Handle("/", r)
 	_ = http.ListenAndServe(addr, nil)

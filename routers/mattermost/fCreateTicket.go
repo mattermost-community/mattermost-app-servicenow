@@ -10,10 +10,13 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 	"github.com/mattermost/mattermost-plugin-apps/server/api"
+	"github.com/pkg/errors"
 )
 
+var ErrCannotCreateClient = errors.New("cannot create client")
+
 func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
-	if !app.IsUserConnected(c.Context.ActingUserID) {
+	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
 		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
 		return
 	}
@@ -32,6 +35,7 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims
 			Type: api.CallResponseTypeForm,
 			Form: getCreateTicketForm(t.Fields, table, formActionOpen),
 		})
+
 		return
 	}
 
@@ -44,6 +48,7 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims
 		}
 
 		utils.WriteCallStandardResponse(w, fmt.Sprintf("Ticket created with sys_id %s.", id))
+
 		return
 	}
 
@@ -54,12 +59,15 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims
 	}
 
 	fields := []*api.Field{}
+
 	for _, v := range t.Fields {
 		field := *v
 		field.Value = c.GetValue(v.Name, "")
+
 		if t.PostDefault == v.Name && len(postField) != 0 {
 			field.Value = postField
 		}
+
 		fields = append(fields, &field)
 	}
 
@@ -78,16 +86,22 @@ func getCreateTicketForm(fields []*api.Field, table string, action formAction) *
 }
 
 func submitTicket(userID, table string, call *api.Call) (string, error) {
-	c := servicenowclient.NewClient(userID)
+	c := servicenowclient.NewClient(call.Context.BotAccessToken, call.Context.MattermostSiteURL, userID)
 	if c == nil {
-		return "", fmt.Errorf("cannot create client")
+		return "", ErrCannotCreateClient
 	}
+
 	return c.CreateIncident(table, call.Values)
 }
 
 func getCreateTicketCall(table string, action formAction) *api.Call {
 	return &api.Call{
-		URL:    fmt.Sprintf("%s?%s=%s&%s=%s", constants.BindingPathCreate, constants.TableIDGetField, table, formActionQueryField, action),
+		URL: fmt.Sprintf("%s?%s=%s&%s=%s",
+			constants.BindingPathCreate,
+			constants.TableIDGetField,
+			table,
+			formActionQueryField,
+			action),
 		Expand: &api.Expand{Post: api.ExpandAll},
 	}
 }

@@ -17,20 +17,25 @@ type Client struct {
 	client *http.Client
 }
 
-func NewClient(userID string) *Client {
+var ErrUnexpectedStatus = errors.New("returned with unexpected status")
+
+func NewClient(botAccessToken, baseURL, userID string) *Client {
 	ctx := context.Background()
-	conf := app.GetOAuthConfig()
-	token, found := store.GetToken(userID)
+	oAuthConf := app.GetOAuthConfig()
+
+	token, found := store.GetToken(botAccessToken, baseURL, userID)
 	if !found {
 		return nil
 	}
+
 	return &Client{
-		client: conf.Client(ctx, token),
+		client: oAuthConf.Client(ctx, token),
 	}
 }
 
 func (c *Client) CreateIncident(table string, v interface{}) (string, error) {
 	url := fmt.Sprintf("%s%s/%s", config.ServiceNowInstance(), "/api/now/table", table)
+
 	b, err := json.Marshal(v)
 	if err != nil {
 		return "", err
@@ -40,12 +45,14 @@ func (c *Client) CreateIncident(table string, v interface{}) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer resp.Body.Close()
 
-	if resp.StatusCode != 201 {
-		return "", fmt.Errorf("call returned with status %v", resp.Status)
+	if resp.StatusCode != http.StatusCreated {
+		return "", fmt.Errorf("%w: %v", ErrUnexpectedStatus, resp.Status)
 	}
 
 	var ticket CreateTicketResponse
+
 	err = json.NewDecoder(resp.Body).Decode(&ticket)
 	if err != nil {
 		return "", errors.Wrap(err, "could not decode create ticket response")

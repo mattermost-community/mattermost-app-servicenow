@@ -27,6 +27,7 @@ func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *api.JWTClai
 			Type: api.CallResponseTypeForm,
 			Form: getConfigureOAuthForm(nil, formActionOpen),
 		})
+
 		return
 	}
 
@@ -40,6 +41,7 @@ func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *api.JWTClai
 		})
 
 		utils.WriteCallStandardResponse(w, "Configuration updated")
+
 		return
 	}
 

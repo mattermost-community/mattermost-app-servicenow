@@ -14,12 +14,13 @@ const (
 )
 
 func fManifest(w http.ResponseWriter, r *http.Request) {
+	baseURL := config.Local().BaseURL
 	manifest := api.Manifest{
 		AppID:       "com.mattermost.servicenow",
 		DisplayName: displayName,
 		Description: description,
-		HTTPRootURL: config.BaseURL(),
-		HomepageURL: config.BaseURL(),
+		HTTPRootURL: baseURL,
+		HomepageURL: baseURL,
 		Type:        api.AppTypeHTTP,
 		RequestedLocations: api.Locations{
 			api.LocationPostMenu,

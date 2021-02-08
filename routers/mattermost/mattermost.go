@@ -13,6 +13,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+var ErrUnexpectedSignMethod = errors.New("unexpected signing method")
+var ErrMissingHeader = errors.Errorf("missing %s: Bearer header", api.OutgoingAuthHeader)
+
 type callHandler func(http.ResponseWriter, *http.Request, *api.JWTClaims, *api.Call)
 
 func Init(router *mux.Router) {
@@ -47,17 +50,18 @@ func extractCall(f callHandler) http.HandlerFunc {
 func checkJWT(req *http.Request) (*api.JWTClaims, error) {
 	authValue := req.Header.Get(api.OutgoingAuthHeader)
 	if !strings.HasPrefix(authValue, "Bearer ") {
-		return nil, errors.Errorf("missing %s: Bearer header", api.OutgoingAuthHeader)
+		return nil, ErrMissingHeader
 	}
 
 	jwtoken := strings.TrimPrefix(authValue, "Bearer ")
 	claims := api.JWTClaims{}
 	_, err := jwt.ParseWithClaims(jwtoken, &claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("%w: %v", ErrUnexpectedSignMethod, token.Header["alg"])
 		}
 		return []byte(constants.AppSecret), nil
 	})
+
 	if err != nil {
 		return nil, err
 	}

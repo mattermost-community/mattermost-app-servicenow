@@ -18,13 +18,15 @@ func fInstall(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *
 		utils.WriteCallResponse(w, response)
 	}
 
-	config.SetMattermostConfig(config.MattermostConfig{
+	config.SetLocalConfig(config.LocalConfig{
 		MattermostURL:  c.Context.MattermostSiteURL,
 		BotID:          c.Context.App.BotUserID,
 		BotAccessToken: c.Context.BotAccessToken,
 	})
 
 	response.Type = api.CallResponseTypeOK
-	response.Markdown = md.Markdownf("Service now installed! Please run `/%s configure oauth` to configure the link between Mattermost and your Service Now instance.", constants.CommandTrigger)
+	response.Markdown = md.Markdownf("Service now installed! "+
+		"Please run `/%s configure oauth` to configure the link between Mattermost and your Service Now instance.",
+		constants.CommandTrigger)
 	utils.WriteCallResponse(w, response)
 }

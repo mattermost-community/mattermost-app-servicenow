@@ -10,7 +10,7 @@ import (
 )
 
 func fDisconnect(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
-	store.DeleteToken(claims.ActingUserID)
+	store.DeleteToken(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID)
 	utils.WriteCallStandardResponse(w, "You are disconnected from Service Now.")
 }
 

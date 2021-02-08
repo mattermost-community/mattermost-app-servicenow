@@ -6,18 +6,22 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
+	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/store"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
 func oauth2Complete(w http.ResponseWriter, r *http.Request) {
+	conf := config.Local()
+
 	code := r.URL.Query().Get("code")
 	if code == "" {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
+
 	state := r.URL.Query().Get("state")
-	if !store.VerifyState(state) {
+	if !store.VerifyState(conf.BotAccessToken, conf.MattermostURL, state) {
 		http.Error(w, "State not found", http.StatusBadRequest)
 		return
 	}
@@ -29,15 +33,17 @@ func oauth2Complete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := context.Background()
+
 	token, err := app.GetOAuthConfig().Exchange(ctx, code)
 	if err != nil {
 		http.Error(w, "Not authorized", http.StatusUnauthorized)
 		return
 	}
 
-	store.StoreToken(token, userID)
+	store.SaveToken(conf.BotAccessToken, conf.MattermostURL, token, userID)
 
-	connectedString := "You have successfuly connected the ServiceNow Mattermost App to ServiceNow. Please close this window."
+	connectedString := "You have successfully connected the ServiceNow Mattermost App to ServiceNow. " +
+		"Please close this window."
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
 		<html>

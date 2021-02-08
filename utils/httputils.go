@@ -5,6 +5,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -15,32 +16,39 @@ import (
 	"github.com/mattermost/mattermost-plugin-apps/server/utils/md"
 )
 
+var ErrNoHost = errors.New("invalid URL, no hostname")
+var ErrRemoteEqualMM = errors.New("provided URL is the Mattermost site URL")
+
 func NormalizeRemoteBaseURL(mattermostSiteURL, remoteURL string) (string, error) {
 	u, err := url.Parse(remoteURL)
 	if err != nil {
 		return "", err
 	}
+
 	if u.Host == "" {
 		ss := strings.Split(u.Path, "/")
 		if len(ss) > 0 && ss[0] != "" {
 			u.Host = ss[0]
 			u.Path = path.Join(ss[1:]...)
 		}
+
 		u, err = url.Parse(u.String())
 		if err != nil {
 			return "", err
 		}
 	}
+
 	if u.Host == "" {
-		return "", fmt.Errorf("invalid URL, no hostname: %q", remoteURL)
+		return "", fmt.Errorf("%w: %q", ErrNoHost, remoteURL)
 	}
+
 	if u.Scheme == "" {
 		u.Scheme = "https"
 	}
 
 	remoteURL = strings.TrimSuffix(u.String(), "/")
 	if remoteURL == strings.TrimSuffix(mattermostSiteURL, "/") {
-		return "", fmt.Errorf("%s is the Mattermost site URL. Please use the remote application's URL", remoteURL)
+		return "", fmt.Errorf("%w (%s). Please use the remote application's URL", ErrRemoteEqualMM, remoteURL)
 	}
 
 	return remoteURL, nil
