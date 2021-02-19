@@ -21,7 +21,6 @@ type OAuthConfig struct {
 type LocalConfig struct {
 	BaseURL        string
 	MattermostURL  string
-	BotID          string
 	BotAccessToken string
 }
 

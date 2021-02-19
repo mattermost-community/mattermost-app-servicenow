@@ -59,18 +59,21 @@ func getConfigureOAuthForm(v map[string]interface{}, action formAction) *api.For
 		Fields: []*api.Field{
 			{
 				Name:       configureOAuthServiceNowInstanceValue,
+				Label:      configureOAuthServiceNowInstanceValue,
 				ModalLabel: "Service Now Instance",
 				Type:       api.FieldTypeText,
 				Value:      utils.GetStringFromMapInterface(v, configureOAuthServiceNowInstanceValue, config.ServiceNowInstance()),
 			},
 			{
 				Name:       configureOAuthClientIDValue,
+				Label:      configureOAuthClientIDValue,
 				ModalLabel: "Client ID",
 				Type:       api.FieldTypeText,
 				Value:      utils.GetStringFromMapInterface(v, configureOAuthClientIDValue, conf.ClientID),
 			},
 			{
 				Name:        configureOAuthClientSecretValue,
+				Label:       configureOAuthClientSecretValue,
 				ModalLabel:  "Client Secret",
 				Type:        api.FieldTypeText,
 				TextSubtype: "password",

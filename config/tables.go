@@ -38,17 +38,19 @@ func GetTables() TablesConfig {
 		c.Tables = TablesConfig{}
 	}
 
-	c.Tables["incidents"] = TableConfig{
-		ID:          "incidents",
+	c.Tables["incident"] = TableConfig{
+		ID:          "incident",
 		DisplayName: "Incidents",
 		Fields: []*api.Field{
 			{
 				Name:       "short_description",
 				ModalLabel: "Short Description",
+				Label:      "short_description",
 				Type:       api.FieldTypeText,
 			},
 			{
 				Name:       "description",
+				Label:      "description",
 				ModalLabel: "Long Description",
 				Type:       api.FieldTypeText,
 			},

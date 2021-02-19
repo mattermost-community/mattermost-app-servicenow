@@ -19,8 +19,8 @@ func fInstall(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *
 	}
 
 	config.SetLocalConfig(config.LocalConfig{
+		BaseURL:        config.Local().BaseURL,
 		MattermostURL:  c.Context.MattermostSiteURL,
-		BotID:          c.Context.App.BotUserID,
 		BotAccessToken: c.Context.BotAccessToken,
 	})
 

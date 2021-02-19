@@ -22,6 +22,7 @@ func baseBinding(label string) *api.Binding {
 	return &api.Binding{
 		Location: constants.BindingPathCreate,
 		Label:    label,
+		Icon:     "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
 		Bindings: []*api.Binding{},
 	}
 }
@@ -49,6 +50,7 @@ func subBindings(tt config.TablesConfig, base *api.Binding, useLocationLabel boo
 		base.Bindings = append(base.Bindings, &api.Binding{
 			Location: api.Location(t.ID),
 			Label:    label,
+			Icon:     "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
 			Call: &api.Call{
 				URL: t.ID,
 			},

@@ -3,6 +3,7 @@ package mattermost
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/clients/servicenowclient"
@@ -47,7 +48,9 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims
 			return
 		}
 
-		utils.WriteCallStandardResponse(w, fmt.Sprintf("Ticket created with sys_id %s.", id))
+		navToURI := fmt.Sprintf("/%s?sys_id=%s", table, url.QueryEscape(id))
+		ticketLink := fmt.Sprintf("%s/nav_to.do?uri=%s", config.ServiceNowInstance(), url.QueryEscape(navToURI))
+		utils.WriteCallStandardResponse(w, fmt.Sprintf("Ticket created with [sys_id %s](%s).", id, ticketLink))
 
 		return
 	}
