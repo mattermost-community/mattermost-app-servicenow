@@ -1,13 +1,15 @@
 package config
 
-import "github.com/mattermost/mattermost-plugin-apps/server/api"
+import (
+	"github.com/mattermost/mattermost-plugin-apps/apps"
+)
 
 type TablesConfig map[string]TableConfig
 
 type TableConfig struct {
 	ID          string
 	DisplayName string
-	Fields      []*api.Field
+	Fields      []*apps.Field
 	Post        bool
 	Command     bool
 	Header      bool
@@ -41,18 +43,18 @@ func GetTables() TablesConfig {
 	c.Tables["incident"] = TableConfig{
 		ID:          "incident",
 		DisplayName: "Incidents",
-		Fields: []*api.Field{
+		Fields: []*apps.Field{
 			{
 				Name:       "short_description",
 				ModalLabel: "Short Description",
 				Label:      "short_description",
-				Type:       api.FieldTypeText,
+				Type:       apps.FieldTypeText,
 			},
 			{
 				Name:       "description",
 				Label:      "description",
 				ModalLabel: "Long Description",
-				Type:       api.FieldTypeText,
+				Type:       apps.FieldTypeText,
 			},
 		},
 		Post:        true,

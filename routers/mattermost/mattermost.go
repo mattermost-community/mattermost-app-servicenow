@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 	"github.com/mattermost/mattermost-plugin-apps/server/api"
 	"github.com/pkg/errors"
 )
@@ -16,7 +17,7 @@ import (
 var ErrUnexpectedSignMethod = errors.New("unexpected signing method")
 var ErrMissingHeader = errors.Errorf("missing %s: Bearer header", api.OutgoingAuthHeader)
 
-type callHandler func(http.ResponseWriter, *http.Request, *api.JWTClaims, *api.Call)
+type callHandler func(http.ResponseWriter, *http.Request, *api.JWTClaims, *apps.Call)
 
 func Init(router *mux.Router) {
 	router.HandleFunc(constants.ManifestPath, fManifest)
@@ -37,7 +38,7 @@ func extractCall(f callHandler) http.HandlerFunc {
 			return
 		}
 
-		data, err := api.UnmarshalCallFromReader(r.Body)
+		data, err := apps.UnmarshalCallFromReader(r.Body)
 		if err != nil {
 			utils.WriteBadRequestError(rw, err)
 			return

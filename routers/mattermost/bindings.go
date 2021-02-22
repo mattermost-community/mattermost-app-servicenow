@@ -7,13 +7,14 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/clients/mattermostclient"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
-func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
-	commands := &api.Binding{
-		Location: api.LocationCommand,
-		Bindings: []*api.Binding{},
+func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
+	commands := &apps.Binding{
+		Location: apps.LocationCommand,
+		Bindings: []*apps.Binding{},
 	}
 
 	connectionCommand := getConnectBinding()
@@ -30,14 +31,14 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 		commands.Bindings = append(commands.Bindings, getSysAdminCommandBindings())
 	}
 
-	out := []*api.Binding{}
+	out := []*apps.Binding{}
 
 	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, claims.ActingUserID) {
 		postBindings, commandBindings, headerBindings := app.GetTablesBindings()
 		if postBindings != nil {
-			out = append(out, &api.Binding{
-				Location: api.LocationPostMenu,
-				Bindings: []*api.Binding{generateTableBindingsCalls(postBindings)},
+			out = append(out, &apps.Binding{
+				Location: apps.LocationPostMenu,
+				Bindings: []*apps.Binding{generateTableBindingsCalls(postBindings)},
 			})
 		}
 
@@ -46,9 +47,9 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 		}
 
 		if headerBindings != nil {
-			out = append(out, &api.Binding{
-				Location: api.LocationChannelHeader,
-				Bindings: []*api.Binding{generateTableBindingsCalls(headerBindings)},
+			out = append(out, &apps.Binding{
+				Location: apps.LocationChannelHeader,
+				Bindings: []*apps.Binding{generateTableBindingsCalls(headerBindings)},
 			})
 		}
 	}
@@ -58,26 +59,26 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 	utils.WriteBindings(w, out)
 }
 
-func generateTableBindingsCalls(b *api.Binding) *api.Binding {
+func generateTableBindingsCalls(b *apps.Binding) *apps.Binding {
 	if len(b.Bindings) == 0 {
-		b.Call = getCreateTicketCall(b.Call.URL, formActionOpen)
+		b.Call = getCreateTicketCall(b.Call.Path, formActionOpen)
 	}
 
 	for _, subBinding := range b.Bindings {
-		subBinding.Call = getCreateTicketCall(subBinding.Call.URL, formActionOpen)
+		subBinding.Call = getCreateTicketCall(subBinding.Call.Path, formActionOpen)
 	}
 
 	return b
 }
 
-func getSysAdminCommandBindings() *api.Binding {
-	return &api.Binding{
+func getSysAdminCommandBindings() *apps.Binding {
+	return &apps.Binding{
 		Location:    constants.LocationConfigure,
 		Label:       "config",
 		Icon:        "",
 		Hint:        "",
 		Description: "Configure the plugin",
-		Bindings: []*api.Binding{
+		Bindings: []*apps.Binding{
 			{
 				Location:    constants.LocationConfigureOAuth,
 				Label:       "oauth",
@@ -89,26 +90,26 @@ func getSysAdminCommandBindings() *api.Binding {
 		},
 	}
 }
-func getConnectBinding() *api.Binding {
-	return &api.Binding{
+func getConnectBinding() *apps.Binding {
+	return &apps.Binding{
 		Location:    constants.LocationConnect,
 		Label:       "connect",
 		Icon:        "",
 		Hint:        "",
 		Description: "Connect your ServiceNow account",
-		Form:        &api.Form{},
+		Form:        &apps.Form{},
 		Call:        getConnectCall(),
 	}
 }
 
-func getDisconnectBinding() *api.Binding {
-	return &api.Binding{
+func getDisconnectBinding() *apps.Binding {
+	return &apps.Binding{
 		Location:    constants.LocationDisconnect,
 		Label:       "disconnect",
 		Icon:        "",
 		Hint:        "",
 		Description: "Disconnect from ServiceNow",
-		Form:        &api.Form{},
+		Form:        &apps.Form{},
 		Call:        getDisconnectCall(),
 	}
 }

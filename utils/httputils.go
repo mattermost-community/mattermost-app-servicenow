@@ -12,7 +12,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/mattermost/mattermost-plugin-apps/server/api"
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 	"github.com/mattermost/mattermost-plugin-apps/server/utils/md"
 )
 
@@ -54,19 +54,19 @@ func NormalizeRemoteBaseURL(mattermostSiteURL, remoteURL string) (string, error)
 	return remoteURL, nil
 }
 
-func WriteCallResponse(w http.ResponseWriter, v api.CallResponse) {
+func WriteCallResponse(w http.ResponseWriter, v apps.CallResponse) {
 	writeJSON(w, v)
 }
 
-func WriteBindings(w http.ResponseWriter, v []*api.Binding) {
-	call := api.CallResponse{
-		Type: api.CallResponseTypeOK,
+func WriteBindings(w http.ResponseWriter, v []*apps.Binding) {
+	call := apps.CallResponse{
+		Type: apps.CallResponseTypeOK,
 		Data: v,
 	}
 	writeJSON(w, call)
 }
 
-func WriteManifest(w http.ResponseWriter, v api.Manifest) {
+func WriteManifest(w http.ResponseWriter, v apps.Manifest) {
 	writeJSON(w, v)
 }
 
@@ -99,16 +99,16 @@ func WriteCallStandardResponse(w http.ResponseWriter, message string) {
 	WriteCallResponse(w, newCallStandardResponse(message))
 }
 
-func newCallStandardResponse(message string) api.CallResponse {
-	return api.CallResponse{
-		Type:     api.CallResponseTypeOK,
+func newCallStandardResponse(message string) apps.CallResponse {
+	return apps.CallResponse{
+		Type:     apps.CallResponseTypeOK,
 		Markdown: md.MD(message),
 	}
 }
 
-func newCallErrorResponse(message string) api.CallResponse {
-	return api.CallResponse{
-		Type:      api.CallResponseTypeError,
+func newCallErrorResponse(message string) apps.CallResponse {
+	return apps.CallResponse{
+		Type:      apps.CallResponseTypeError,
 		ErrorText: message,
 	}
 }

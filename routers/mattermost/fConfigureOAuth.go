@@ -7,6 +7,7 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
@@ -16,15 +17,15 @@ const (
 	configureOAuthServiceNowInstanceValue = "instance"
 )
 
-func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
+func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
 	if !c.Context.ExpandedContext.ActingUser.IsSystemAdmin() {
 		utils.WriteCallErrorResponse(w, "You must be a system admin to configure oauth.")
 		return
 	}
 
-	if c.Type == api.CallTypeForm {
-		utils.WriteCallResponse(w, api.CallResponse{
-			Type: api.CallResponseTypeForm,
+	if c.Type == apps.CallTypeForm {
+		utils.WriteCallResponse(w, apps.CallResponse{
+			Type: apps.CallResponseTypeForm,
 			Form: getConfigureOAuthForm(nil, formActionOpen),
 		})
 
@@ -45,37 +46,37 @@ func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *api.JWTClai
 		return
 	}
 
-	utils.WriteCallResponse(w, api.CallResponse{
-		Type: api.CallResponseTypeForm,
+	utils.WriteCallResponse(w, apps.CallResponse{
+		Type: apps.CallResponseTypeForm,
 		Form: getConfigureOAuthForm(c.Values, formActionSubmit),
 	})
 }
 
-func getConfigureOAuthForm(v map[string]interface{}, action formAction) *api.Form {
+func getConfigureOAuthForm(v map[string]interface{}, action formAction) *apps.Form {
 	conf := config.OAuth()
 
-	return &api.Form{
+	return &apps.Form{
 		Title: "Configure OAuth",
-		Fields: []*api.Field{
+		Fields: []*apps.Field{
 			{
 				Name:       configureOAuthServiceNowInstanceValue,
 				Label:      configureOAuthServiceNowInstanceValue,
 				ModalLabel: "Service Now Instance",
-				Type:       api.FieldTypeText,
+				Type:       apps.FieldTypeText,
 				Value:      utils.GetStringFromMapInterface(v, configureOAuthServiceNowInstanceValue, config.ServiceNowInstance()),
 			},
 			{
 				Name:       configureOAuthClientIDValue,
 				Label:      configureOAuthClientIDValue,
 				ModalLabel: "Client ID",
-				Type:       api.FieldTypeText,
+				Type:       apps.FieldTypeText,
 				Value:      utils.GetStringFromMapInterface(v, configureOAuthClientIDValue, conf.ClientID),
 			},
 			{
 				Name:        configureOAuthClientSecretValue,
 				Label:       configureOAuthClientSecretValue,
 				ModalLabel:  "Client Secret",
-				Type:        api.FieldTypeText,
+				Type:        apps.FieldTypeText,
 				TextSubtype: "password",
 				Value:       utils.GetStringFromMapInterface(v, configureOAuthClientSecretValue, conf.ClientSecret),
 			},
@@ -84,9 +85,9 @@ func getConfigureOAuthForm(v map[string]interface{}, action formAction) *api.For
 	}
 }
 
-func getConfigureOAuthCall(action formAction) *api.Call {
-	return &api.Call{
-		URL:    fmt.Sprintf("%s?%s=%s", constants.BindingPathConfigureOAuth, formActionQueryField, action),
-		Expand: &api.Expand{ActingUser: api.ExpandAll},
+func getConfigureOAuthCall(action formAction) *apps.Call {
+	return &apps.Call{
+		Path:   fmt.Sprintf("%s?%s=%s", constants.BindingPathConfigureOAuth, formActionQueryField, action),
+		Expand: &apps.Expand{ActingUser: apps.ExpandAll},
 	}
 }
