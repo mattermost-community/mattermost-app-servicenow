@@ -3,7 +3,6 @@ package mattermost
 import (
 	"net/http"
 
-	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
@@ -13,21 +12,8 @@ const (
 	description = "Service Now integration"
 )
 
-func fManifest(w http.ResponseWriter, r *http.Request) {
-	baseURL := config.Local().BaseURL
-	manifest := apps.Manifest{
-		AppID:       "com.mattermost.servicenow",
-		DisplayName: displayName,
-		Description: description,
-		HTTPRootURL: baseURL,
-		HomepageURL: baseURL,
-		Type:        apps.AppTypeHTTP,
-		RequestedLocations: apps.Locations{
-			apps.LocationPostMenu,
-			apps.LocationCommand,
-			apps.LocationChannelHeader,
-		},
+func fManifest(m *apps.Manifest) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		utils.WriteManifest(w, *m)
 	}
-
-	utils.WriteManifest(w, manifest)
 }

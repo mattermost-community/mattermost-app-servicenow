@@ -1,0 +1,23 @@
+{
+    "app_id": "com.mattermost.servicenow",
+    "app_type": "aws_lambda",
+    "version": "0.1.0",
+    "display_name": "Service Now",
+    "description": "Service Now integration",
+    "homepage_url": "https://github.com/mattermost/mattermost-app-servicenow",
+    "root_url": "",
+    "requested_permissions": [],
+    "requested_locations": [
+        "/command",
+        "/channel_header",
+        "/post_menu"
+    ],
+    "functions": [
+        {
+            "name": "go-function",
+            "handler": "mattermost-app-servicenow",
+            "runtime": "go1.x"
+        }
+    ],
+    "assets": []
+}
