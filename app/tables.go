@@ -3,10 +3,10 @@ package app
 import (
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
-	"github.com/mattermost/mattermost-plugin-apps/server/api"
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
-func GetTablesBindings() (post, command, header *api.Binding) {
+func GetTablesBindings() (post, command, header *apps.Binding) {
 	pt, ct, ht := filterTables(config.GetTables())
 	pb := baseBinding("Create Ticket")
 	cb := baseBinding("create-ticket")
@@ -18,23 +18,23 @@ func GetTablesBindings() (post, command, header *api.Binding) {
 	return
 }
 
-func baseBinding(label string) *api.Binding {
-	return &api.Binding{
+func baseBinding(label string) *apps.Binding {
+	return &apps.Binding{
 		Location: constants.BindingPathCreate,
 		Label:    label,
 		Icon:     "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
-		Bindings: []*api.Binding{},
+		Bindings: []*apps.Binding{},
 	}
 }
 
-func subBindings(tt config.TablesConfig, base *api.Binding, useLocationLabel bool) *api.Binding {
+func subBindings(tt config.TablesConfig, base *apps.Binding, useLocationLabel bool) *apps.Binding {
 	switch len(tt) {
 	case 0:
 		return nil
 	case 1:
 		for _, t := range tt {
-			base.Call = &api.Call{
-				URL: t.ID,
+			base.Call = &apps.Call{
+				Path: t.ID,
 			}
 
 			return base
@@ -47,12 +47,12 @@ func subBindings(tt config.TablesConfig, base *api.Binding, useLocationLabel boo
 			label = t.ID
 		}
 
-		base.Bindings = append(base.Bindings, &api.Binding{
-			Location: api.Location(t.ID),
+		base.Bindings = append(base.Bindings, &apps.Binding{
+			Location: apps.Location(t.ID),
 			Label:    label,
 			Icon:     "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
-			Call: &api.Call{
-				URL: t.ID,
+			Call: &apps.Call{
+				Path: t.ID,
 			},
 		})
 	}

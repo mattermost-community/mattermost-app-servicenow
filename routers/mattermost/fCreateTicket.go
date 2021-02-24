@@ -10,13 +10,14 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 	"github.com/mattermost/mattermost-plugin-apps/server/api"
 	"github.com/pkg/errors"
 )
 
 var ErrCannotCreateClient = errors.New("cannot create client")
 
-func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *api.Call) {
+func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
 	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
 		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
 		return
@@ -31,9 +32,9 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims
 	}
 
 	// Command is asking for the form definition
-	if c.Type == api.CallTypeForm {
-		utils.WriteCallResponse(w, api.CallResponse{
-			Type: api.CallResponseTypeForm,
+	if c.Type == apps.CallTypeForm {
+		utils.WriteCallResponse(w, apps.CallResponse{
+			Type: apps.CallResponseTypeForm,
 			Form: getCreateTicketForm(t.Fields, table, formActionOpen),
 		})
 
@@ -61,7 +62,7 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims
 		postField = c.Context.ExpandedContext.Post.Message
 	}
 
-	fields := []*api.Field{}
+	fields := []*apps.Field{}
 
 	for _, v := range t.Fields {
 		field := *v
@@ -74,21 +75,21 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims
 		fields = append(fields, &field)
 	}
 
-	utils.WriteCallResponse(w, api.CallResponse{
-		Type: api.CallResponseTypeForm,
+	utils.WriteCallResponse(w, apps.CallResponse{
+		Type: apps.CallResponseTypeForm,
 		Form: getCreateTicketForm(fields, table, formActionSubmit),
 	})
 }
 
-func getCreateTicketForm(fields []*api.Field, table string, action formAction) *api.Form {
-	return &api.Form{
+func getCreateTicketForm(fields []*apps.Field, table string, action formAction) *apps.Form {
+	return &apps.Form{
 		Title:  "Create ticket",
 		Fields: fields,
 		Call:   getCreateTicketCall(table, action),
 	}
 }
 
-func submitTicket(userID, table string, call *api.Call) (string, error) {
+func submitTicket(userID, table string, call *apps.Call) (string, error) {
 	c := servicenowclient.NewClient(call.Context.BotAccessToken, call.Context.MattermostSiteURL, userID)
 	if c == nil {
 		return "", ErrCannotCreateClient
@@ -97,14 +98,14 @@ func submitTicket(userID, table string, call *api.Call) (string, error) {
 	return c.CreateIncident(table, call.Values)
 }
 
-func getCreateTicketCall(table string, action formAction) *api.Call {
-	return &api.Call{
-		URL: fmt.Sprintf("%s?%s=%s&%s=%s",
+func getCreateTicketCall(table string, action formAction) *apps.Call {
+	return &apps.Call{
+		Path: fmt.Sprintf("%s?%s=%s&%s=%s",
 			constants.BindingPathCreate,
 			constants.TableIDGetField,
 			table,
 			formActionQueryField,
 			action),
-		Expand: &api.Expand{Post: api.ExpandAll},
+		Expand: &apps.Expand{Post: apps.ExpandAll},
 	}
 }

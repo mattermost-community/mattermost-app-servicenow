@@ -15,7 +15,7 @@ require (
 	github.com/hashicorp/go-plugin v1.4.0 // indirect
 	github.com/jhump/protoreflect v1.8.1 // indirect
 	github.com/lib/pq v1.9.0 // indirect
-	github.com/mattermost/mattermost-plugin-apps v0.0.0-20210114214553-071b0c01b5e1
+	github.com/mattermost/mattermost-plugin-apps v0.0.0-20210222112607-159c0e1fabce
 	github.com/mattermost/mattermost-server/v5 v5.31.0
 	github.com/nelsam/hel/v2 v2.3.3 // indirect
 	github.com/pkg/errors v0.9.1
