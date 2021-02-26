@@ -9,6 +9,10 @@
   - If a base URL has been set on step 2, run the install command with that URL. (e.g. `/app install --url http://myurl.com/manifest`)
 4. As secret key, use `1234`.
 
+## Provision
+
+To provision this PR to AWS run `make dist` to generate the App bundle and then follow the steps [here].
+
 ## Configuration
 
 1. OAuth must be configured to use ServiceNow. In order to configure ServiceNow side, refer to [ServiceNow documentation](https://docs.servicenow.com/bundle/paris-platform-administration/page/administer/security/task/t_CreateEndpointforExternalClients.html).
@@ -24,3 +28,4 @@
 2. Tickets can be created either by the post menu item, channel header icon, or slash command.
   - Tickets created from post menu will populate the short description with the post content.
   - Tickets created by commands will show a confirmation modal before creating the ticket.
+

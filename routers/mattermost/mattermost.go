@@ -19,8 +19,8 @@ var ErrMissingHeader = errors.Errorf("missing %s: Bearer header", api.OutgoingAu
 
 type callHandler func(http.ResponseWriter, *http.Request, *api.JWTClaims, *apps.Call)
 
-func Init(router *mux.Router) {
-	router.HandleFunc(constants.ManifestPath, fManifest)
+func Init(router *mux.Router, m *apps.Manifest) {
+	router.HandleFunc(constants.ManifestPath, fManifest(m))
 	router.HandleFunc(constants.InstallPath, extractCall(fInstall))
 	router.HandleFunc(constants.BindingsPath, extractCall(fBindings))
 
