@@ -11,7 +11,7 @@
 
 ## Provision
 
-To provision this PR to AWS run `make dist` to generate the App bundle and then follow the steps [here].
+To provision this PR to AWS run `make dist` to generate the App bundle and then follow the steps [here](https://github.com/mattermost/mattermost-plugin-apps#provisioning).
 
 ## Configuration
 
