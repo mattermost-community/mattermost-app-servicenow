@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "embed"
+	"embed"
 	"encoding/json"
 
 	"net/http"
@@ -25,6 +25,9 @@ const (
 //go:embed manifest.json
 var manifestSource []byte
 
+//go:embed static
+var staticAssets embed.FS
+
 func main() {
 	var manifest apps.Manifest
 	err := json.Unmarshal(manifestSource, &manifest)
@@ -34,7 +37,7 @@ func main() {
 
 	// Init routers
 	r := mux.NewRouter()
-	mattermost.Init(r, &manifest)
+	mattermost.Init(r, &manifest, staticAssets)
 	oauth.Init(r)
 
 	http.Handle("/", r)
@@ -49,7 +52,7 @@ func main() {
 			addr = os.Args[addressPosition]
 		}
 
-		manifest.HTTPRootURL = addr
+		manifest.HTTPRootURL = config.Local().BaseURL
 		manifest.Type = apps.AppTypeHTTP
 
 		_ = http.ListenAndServe(addr, nil)
