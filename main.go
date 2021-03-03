@@ -49,7 +49,7 @@ func main() {
 			addr = os.Args[addressPosition]
 		}
 
-		manifest.HTTPRootURL = addr
+		manifest.HTTPRootURL = config.Local().BaseURL
 		manifest.Type = apps.AppTypeHTTP
 
 		_ = http.ListenAndServe(addr, nil)
