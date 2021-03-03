@@ -17,34 +17,41 @@ import (
 var ErrUnexpectedSignMethod = errors.New("unexpected signing method")
 var ErrMissingHeader = errors.Errorf("missing %s: Bearer header", api.OutgoingAuthHeader)
 
-type callHandler func(http.ResponseWriter, *http.Request, *api.JWTClaims, *apps.Call)
+type callHandler func(http.ResponseWriter, *http.Request, *apps.Call)
 
-func Init(router *mux.Router, m *apps.Manifest) {
+func Init(router *mux.Router, m *apps.Manifest, localMode bool) {
 	router.HandleFunc(constants.ManifestPath, fManifest(m))
-	router.HandleFunc(constants.InstallPath, extractCall(fInstall))
-	router.HandleFunc(constants.BindingsPath, extractCall(fBindings))
+	router.HandleFunc(constants.InstallPath, extractCall(fInstall, localMode))
+	router.HandleFunc(constants.BindingsPath, extractCall(fBindings, localMode))
 
-	router.HandleFunc(constants.BindingPathCreate, extractCall(fCreateTicket))
-	router.HandleFunc(constants.BindingPathConnect, extractCall(fConnect))
-	router.HandleFunc(constants.BindingPathDisconnect, extractCall(fDisconnect))
-	router.HandleFunc(constants.BindingPathConfigureOAuth, extractCall(fConfigureOAuth))
+	router.HandleFunc(constants.BindingPathCreate, extractCall(fCreateTicket, localMode))
+	router.HandleFunc(constants.BindingPathConnect, extractCall(fConnect, localMode))
+	router.HandleFunc(constants.BindingPathDisconnect, extractCall(fDisconnect, localMode))
+	router.HandleFunc(constants.BindingPathConfigureOAuth, extractCall(fConfigureOAuth, localMode))
 }
 
-func extractCall(f callHandler) http.HandlerFunc {
+func extractCall(f callHandler, localMode bool) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		claims, err := checkJWT(r)
-		if err != nil {
-			utils.WriteBadRequestError(rw, err)
-			return
-		}
-
 		data, err := apps.UnmarshalCallFromReader(r.Body)
 		if err != nil {
 			utils.WriteBadRequestError(rw, err)
 			return
 		}
 
-		f(rw, r, claims, data)
+		if localMode {
+			claims, err := checkJWT(r)
+			if err != nil {
+				utils.WriteBadRequestError(rw, err)
+				return
+			}
+
+			if data.Context.ActingUserID != "" && data.Context.ActingUserID != claims.ActingUserID {
+				utils.WriteBadRequestError(rw, errors.New("JWT claim doesn't match actingUserID in context"))
+				return
+			}
+		}
+
+		f(rw, r, data)
 	}
 }
 

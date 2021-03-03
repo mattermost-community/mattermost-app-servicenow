@@ -9,10 +9,9 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/store"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
-func fConnect(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
+func fConnect(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	state := utils.CreateOAuthState(c.Context.ActingUserID, c.Context.ChannelID)
 	conf := app.GetOAuthConfig()
 

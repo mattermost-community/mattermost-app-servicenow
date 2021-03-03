@@ -8,10 +8,9 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
-func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
+func fBindings(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	commands := &apps.Binding{
 		Location: apps.LocationCommand,
 		Bindings: []*apps.Binding{},
@@ -19,21 +18,21 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 
 	connectionCommand := getConnectBinding()
 
-	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, claims.ActingUserID) {
+	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
 		connectionCommand = getDisconnectBinding()
 	}
 
 	commands.Bindings = append(commands.Bindings, connectionCommand)
 	client := mattermostclient.NewMMClient(c.Context.BotUserID, c.Context.BotAccessToken, c.Context.MattermostSiteURL)
 
-	user, err := client.GetUser(claims.ActingUserID)
+	user, err := client.GetUser(c.Context.ActingUserID)
 	if err == nil && user.IsSystemAdmin() {
 		commands.Bindings = append(commands.Bindings, getSysAdminCommandBindings())
 	}
 
 	out := []*apps.Binding{}
 
-	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, claims.ActingUserID) {
+	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
 		postBindings, commandBindings, headerBindings := app.GetTablesBindings()
 		if postBindings != nil {
 			out = append(out, &apps.Binding{

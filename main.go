@@ -27,19 +27,22 @@ var manifestSource []byte
 
 func main() {
 	var manifest apps.Manifest
+
 	err := json.Unmarshal(manifestSource, &manifest)
 	if err != nil {
 		panic("failed to load manfest: " + err.Error())
 	}
 
+	localMode := os.Getenv("LOCAL") == "true"
+
 	// Init routers
 	r := mux.NewRouter()
-	mattermost.Init(r, &manifest)
+	mattermost.Init(r, &manifest, localMode)
 	oauth.Init(r)
 
 	http.Handle("/", r)
 
-	if os.Getenv("LOCAL") == "true" {
+	if localMode {
 		if len(os.Args) > baseURLPosition {
 			config.SetBaseURL(os.Args[baseURLPosition])
 		}
