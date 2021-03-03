@@ -1,6 +1,9 @@
 BASE?=http://localhost:3000
 ADDR?=:3000
 
+GO ?= go
+GO_TEST_FLAGS ?= -race
+
 .PHONY: all
 ## all: builds and runs the service
 all: run
@@ -8,12 +11,28 @@ all: run
 .PHONY: build
 ## build: build the executable
 build:
-	go1.16 build -o dist/mattermost-app-servicenow
+	$(GO) build -o dist/mattermost-app-servicenow
 
 .PHONY: run
 ## run: runs the service
 run: build
 	LOCAL=true ./dist/mattermost-app-servicenow ${BASE} ${ADDR}
+
+.PHONY: test
+## test: tests all packages
+test:
+	$(GO) test $(GO_TEST_FLAGS) ./...
+
+.PHONY: lint
+## lint: Run golangci-lint on codebase
+lint: 
+	@if ! [ -x "$$(command -v golangci-lint)" ]; then \
+		echo "golangci-lint is not installed. Please see https://github.com/golangci/golangci-lint#install for installation instructions."; \
+		exit 1; \
+	fi; \
+
+	@echo Running golangci-lint
+	golangci-lint run ./...
 
 .PHONY: dist
 ## dist: creates the bundle file

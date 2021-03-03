@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 )
 

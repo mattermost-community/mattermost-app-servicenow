@@ -3,17 +3,19 @@ package mattermost
 import (
 	"net/http"
 
+	"github.com/mattermost/mattermost-plugin-apps/apps"
+	"github.com/mattermost/mattermost-plugin-apps/server/api"
+
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/clients/mattermostclient"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
-	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/server/api"
 )
 
 func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
 	commands := &apps.Binding{
 		Location: apps.LocationCommand,
+		Icon:     "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
 		Bindings: []*apps.Binding{},
 	}
 
@@ -94,7 +96,7 @@ func getConnectBinding() *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationConnect,
 		Label:       "connect",
-		Icon:        "",
+		Icon:        "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
 		Hint:        "",
 		Description: "Connect your ServiceNow account",
 		Form:        &apps.Form{},

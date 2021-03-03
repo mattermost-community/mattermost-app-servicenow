@@ -7,10 +7,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/pkg/errors"
+
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/store"
-	"github.com/pkg/errors"
 )
 
 type Client struct {

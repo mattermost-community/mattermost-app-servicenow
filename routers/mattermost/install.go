@@ -3,12 +3,13 @@ package mattermost
 import (
 	"net/http"
 
-	"github.com/mattermost/mattermost-app-servicenow/config"
-	"github.com/mattermost/mattermost-app-servicenow/constants"
-	"github.com/mattermost/mattermost-app-servicenow/utils"
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 	"github.com/mattermost/mattermost-plugin-apps/server/api"
 	"github.com/mattermost/mattermost-plugin-apps/server/utils/md"
+
+	"github.com/mattermost/mattermost-app-servicenow/config"
+	"github.com/mattermost/mattermost-app-servicenow/constants"
+	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
 func fInstall(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
