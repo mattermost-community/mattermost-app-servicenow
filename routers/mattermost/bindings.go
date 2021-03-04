@@ -33,7 +33,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	out := []*apps.Binding{}
 
 	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
-		postBindings, commandBindings, headerBindings := app.GetTablesBindings()
+		postBindings, commandBindings, headerBindings := app.GetTablesBindings(c.Context.MattermostSiteURL)
 		if postBindings != nil {
 			out = append(out, &apps.Binding{
 				Location: apps.LocationPostMenu,
