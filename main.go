@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "embed"
+	"embed"
 	"encoding/json"
 
 	"net/http"
@@ -25,6 +25,9 @@ const (
 //go:embed manifest.json
 var manifestSource []byte //nolint: gochecknoglobals
 
+//go:embed static
+var staticAssets embed.FS //nolint: gochecknoglobals
+
 func main() {
 	var manifest apps.Manifest
 
@@ -35,7 +38,7 @@ func main() {
 
 	// Init routers
 	r := mux.NewRouter()
-	mattermost.Init(r, &manifest)
+	mattermost.Init(r, &manifest, staticAssets)
 	oauth.Init(r)
 
 	http.Handle("/", r)
