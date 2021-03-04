@@ -1,33 +1,39 @@
 package app
 
 import (
+	"strings"
+
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
-func GetTablesBindings() (post, command, header *apps.Binding) {
+func GetTablesBindings(siteURL string) (post, command, header *apps.Binding) {
 	pt, ct, ht := filterTables(config.GetTables())
-	pb := baseBinding("Create Ticket")
-	cb := baseBinding("create-ticket")
-	hb := baseBinding("Create Ticket")
-	post = subBindings(pt, pb, false)
-	command = subBindings(ct, cb, true)
-	header = subBindings(ht, hb, false)
+	pb := baseBinding(siteURL, "Create Ticket")
+	cb := baseBinding(siteURL, "create-ticket")
+	hb := baseBinding(siteURL, "Create Ticket")
+	post = subBindings(siteURL, pt, pb, false)
+	command = subBindings(siteURL, ct, cb, true)
+	header = subBindings(siteURL, ht, hb, false)
 
 	return
 }
 
-func baseBinding(label string) *apps.Binding {
+func getIconURL(siteURL, name string) string {
+	return strings.TrimRight(siteURL, "/") + "/plugins/com.mattermost.apps/api/v1/static/com.mattermost.servicenow/" + name
+}
+
+func baseBinding(siteURL, label string) *apps.Binding {
 	return &apps.Binding{
 		Location: constants.BindingPathCreate,
 		Label:    label,
-		Icon:     "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
+		Icon:     getIconURL(siteURL, "now-mobile-icon.png"),
 		Bindings: []*apps.Binding{},
 	}
 }
 
-func subBindings(tt config.TablesConfig, base *apps.Binding, useLocationLabel bool) *apps.Binding {
+func subBindings(siteURL string, tt config.TablesConfig, base *apps.Binding, useLocationLabel bool) *apps.Binding {
 	switch len(tt) {
 	case 0:
 		return nil
@@ -50,7 +56,7 @@ func subBindings(tt config.TablesConfig, base *apps.Binding, useLocationLabel bo
 		base.Bindings = append(base.Bindings, &apps.Binding{
 			Location: apps.Location(t.ID),
 			Label:    label,
-			Icon:     "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
+			Icon:     getIconURL(siteURL, "now-mobile-icon.png"),
 			Call: &apps.Call{
 				Path: t.ID,
 			},

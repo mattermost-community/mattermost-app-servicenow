@@ -3,9 +3,10 @@ package constants
 import "time"
 
 const (
-	ManifestPath = "/manifest"
-	InstallPath  = "/install"
-	BindingsPath = "/bindings"
+	ManifestPath    = "/manifest"
+	InstallPath     = "/install"
+	BindingsPath    = "/bindings"
+	StaticAssetPath = "/static"
 
 	OAuthPath         = "/oauth"
 	OAuthConnectPath  = "/connect"
