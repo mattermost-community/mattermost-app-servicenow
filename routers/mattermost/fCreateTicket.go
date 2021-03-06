@@ -5,13 +5,14 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/mattermost/mattermost-plugin-apps/apps"
+	"github.com/pkg/errors"
+
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/clients/servicenowclient"
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
-	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/pkg/errors"
 )
 
 var ErrCannotCreateClient = errors.New("cannot create client")

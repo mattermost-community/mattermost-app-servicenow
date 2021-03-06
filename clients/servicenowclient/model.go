@@ -9,8 +9,8 @@ type BaseTicket struct {
 	ModCount   string       `json:"sys_mod_count"`
 	UpdatedBy  string       `json:"sys_updated_by"`
 	CreatedBy  string       `json:"sys_created_by"`
-	//UpdatedOn  time.Time    `json:"sys_updated_on"`
-	//CreatedOn  time.Time    `json:"sys_created_on"`
+	// UpdatedOn  time.Time    `json:"sys_updated_on"`
+	// CreatedOn  time.Time    `json:"sys_created_on"`
 }
 
 type TicketDomain struct {

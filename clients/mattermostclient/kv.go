@@ -98,7 +98,10 @@ func (c *KVClient) newRequest(key string, body io.Reader, method string) (*http.
 
 	req.Header.Set("Authorization", "BEARER"+" "+c.token)
 
-	req.ParseForm()
+	if err := req.ParseForm(); err != nil {
+		return nil, err
+	}
+
 	req.Form.Add("prefix", "servicenow")
 
 	return req, nil

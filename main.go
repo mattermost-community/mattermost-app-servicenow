@@ -10,11 +10,11 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
 	"github.com/gorilla/mux"
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/routers/mattermost"
 	"github.com/mattermost/mattermost-app-servicenow/routers/oauth"
-	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
 const (
@@ -23,10 +23,10 @@ const (
 )
 
 //go:embed manifest.json
-var manifestSource []byte
+var manifestSource []byte //nolint: gochecknoglobals
 
 //go:embed static
-var staticAssets embed.FS
+var staticAssets embed.FS //nolint: gochecknoglobals
 
 func main() {
 	var manifest apps.Manifest

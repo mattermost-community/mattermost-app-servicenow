@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/mattermost/mattermost-plugin-apps/apps"
+
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/store"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
-	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
 func fConnect(w http.ResponseWriter, r *http.Request, c *apps.Call) {
