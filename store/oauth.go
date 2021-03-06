@@ -4,8 +4,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/mattermost/mattermost-app-servicenow/clients/mattermostclient"
 	"golang.org/x/oauth2"
+
+	"github.com/mattermost/mattermost-app-servicenow/clients/mattermostclient"
 )
 
 func SaveState(botAccessToken, baseURL, state string) {

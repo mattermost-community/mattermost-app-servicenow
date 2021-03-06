@@ -1,9 +1,10 @@
 package app
 
 import (
+	"golang.org/x/oauth2"
+
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
-	"golang.org/x/oauth2"
 )
 
 func GetOAuthConfig() *oauth2.Config {

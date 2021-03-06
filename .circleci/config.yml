@@ -1,0 +1,115 @@
+version: 2.1
+
+orbs:
+  aws-s3: circleci/aws-s3@2.0.0
+  tools: gotest/tools@0.0.13
+
+executors:
+  default:
+    docker:
+      - image: circleci/golang:1.16
+
+aliases:
+- &restore_cache
+  restore_cache:
+    key: go-mod-v1-{{ checksum "go.sum" }}
+- &save_cache
+  save_cache:
+    key: go-mod-v1-{{ checksum "go.sum" }}
+    paths:
+    - "/go/pkg/mod"
+
+jobs:
+  lint:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - tools/install-golangci-lint:
+          version: 1.33.2
+      - *restore_cache
+      - run:
+          name: Running linter check
+          command: make lint
+      - run: go mod tidy -v
+      - run:
+          name: Check git diff
+          command: |
+            git --no-pager diff --exit-code go.mod go.sum || (echo "Please run \"go mod tidy\" and commit the changes in go.mod and go.sum." && exit 1)
+      - *save_cache
+
+  test:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - *restore_cache
+      - run: make test
+      - *save_cache
+
+  build:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - run:
+          name: Building Apps bundle
+          command: make dist
+      - persist_to_workspace:
+          root: dist
+          paths:
+            - "bundle.zip"
+      - store_artifacts:
+          path: dist
+
+  deploy-release:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - attach_workspace:
+          at: dist
+      - run: "mv dist/bundle.zip dist/$CIRCLE_PROJECT_REPONAME-$CIRCLE_TAG.zip"
+      - aws-s3/copy:
+          from: "dist/dist/$CIRCLE_PROJECT_REPONAME-$CIRCLE_TAG.zip"
+          to: "s3://$BUCKET"
+          arguments: "--cache-control no-cache"
+
+workflows:
+  version: 2
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - lint
+      - test
+      - build
+  ci:
+    jobs:
+      - lint:
+          filters:
+            tags:
+              only: /^v.*/
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
+      - deploy-release:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          context: apps-ci
+          requires:
+            - lint
+            - test
+            - build

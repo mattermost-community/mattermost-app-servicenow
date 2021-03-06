@@ -3,9 +3,10 @@ package app
 import (
 	"strings"
 
+	"github.com/mattermost/mattermost-plugin-apps/apps"
+
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
-	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
 func GetTablesBindings(siteURL string) (post, command, header *apps.Binding) {
