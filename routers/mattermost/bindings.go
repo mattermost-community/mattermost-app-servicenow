@@ -14,6 +14,8 @@ import (
 
 func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
 	baseCommand := &apps.Binding{
+		Label:       "servicenow",
+		Location:    "servicenow",
 		Description: "Create incidents in your ServiceNow instance",
 		Icon:        "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
 	}
