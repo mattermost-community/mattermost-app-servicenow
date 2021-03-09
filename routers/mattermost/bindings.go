@@ -13,10 +13,16 @@ import (
 )
 
 func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
+	baseCommand := &apps.Binding{
+		Description: "Create incidents in your ServiceNow instance",
+		Icon:        "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
+	}
+
 	commands := &apps.Binding{
 		Location: apps.LocationCommand,
-		Icon:     "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
-		Bindings: []*apps.Binding{},
+		Bindings: []*apps.Binding{
+			baseCommand,
+		},
 	}
 
 	connectionCommand := getConnectBinding()
@@ -25,12 +31,12 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 		connectionCommand = getDisconnectBinding()
 	}
 
-	commands.Bindings = append(commands.Bindings, connectionCommand)
+	baseCommand.Bindings = append(commands.Bindings, connectionCommand)
 	client := mattermostclient.NewMMClient(c.Context.BotUserID, c.Context.BotAccessToken, c.Context.MattermostSiteURL)
 
 	user, err := client.GetUser(claims.ActingUserID)
 	if err == nil && user.IsSystemAdmin() {
-		commands.Bindings = append(commands.Bindings, getSysAdminCommandBindings())
+		baseCommand.Bindings = append(commands.Bindings, getSysAdminCommandBindings())
 	}
 
 	out := []*apps.Binding{}
@@ -45,7 +51,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 		}
 
 		if commandBindings != nil {
-			commands.Bindings = append(commands.Bindings, generateTableBindingsCalls(commandBindings))
+			baseCommand.Bindings = append(commands.Bindings, generateTableBindingsCalls(commandBindings))
 		}
 
 		if headerBindings != nil {
