@@ -13,11 +13,12 @@ import (
 )
 
 func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
+	mattermostSiteURL := c.Context.MattermostSiteURL
 	baseCommand := &apps.Binding{
 		Label:       "servicenow",
 		Location:    "servicenow",
 		Description: "Create incidents in your ServiceNow instance",
-		Icon:        "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
+		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png"),
 	}
 
 	commands := &apps.Binding{
@@ -27,18 +28,18 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 		},
 	}
 
-	connectionCommand := getConnectBinding()
+	connectionCommand := getConnectBinding(mattermostSiteURL)
 
 	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, claims.ActingUserID) {
 		connectionCommand = getDisconnectBinding()
 	}
 
-	baseCommand.Bindings = append(commands.Bindings, connectionCommand)
+	baseCommand.Bindings = append(baseCommand.Bindings, connectionCommand)
 	client := mattermostclient.NewMMClient(c.Context.BotUserID, c.Context.BotAccessToken, c.Context.MattermostSiteURL)
 
 	user, err := client.GetUser(claims.ActingUserID)
 	if err == nil && user.IsSystemAdmin() {
-		baseCommand.Bindings = append(commands.Bindings, getSysAdminCommandBindings())
+		baseCommand.Bindings = append(baseCommand.Bindings, getSysAdminCommandBindings())
 	}
 
 	out := []*apps.Binding{}
@@ -53,7 +54,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 		}
 
 		if commandBindings != nil {
-			baseCommand.Bindings = append(commands.Bindings, generateTableBindingsCalls(commandBindings))
+			baseCommand.Bindings = append(baseCommand.Bindings, generateTableBindingsCalls(commandBindings))
 		}
 
 		if headerBindings != nil {
@@ -100,11 +101,11 @@ func getSysAdminCommandBindings() *apps.Binding {
 		},
 	}
 }
-func getConnectBinding() *apps.Binding {
+func getConnectBinding(mattermostSiteURL string) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationConnect,
 		Label:       "connect",
-		Icon:        "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
+		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png"),
 		Hint:        "",
 		Description: "Connect your ServiceNow account",
 		Form:        &apps.Form{},
