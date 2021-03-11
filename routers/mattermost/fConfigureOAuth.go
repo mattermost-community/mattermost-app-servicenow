@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/server/api"
 
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
@@ -18,7 +17,7 @@ const (
 	configureOAuthServiceNowInstanceValue = "instance"
 )
 
-func fConfigureOAuth(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
+func fConfigureOAuth(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	if !c.Context.ExpandedContext.ActingUser.IsSystemAdmin() {
 		utils.WriteCallErrorResponse(w, "You must be a system admin to configure oauth.")
 		return

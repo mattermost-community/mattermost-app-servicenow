@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/server/api"
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/clients/mattermostclient"
@@ -12,7 +11,7 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
-func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
+func fBindings(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	commands := &apps.Binding{
 		Location: apps.LocationCommand,
 		Icon:     "https://docs.servicenow.com/bundle/mobile-rn/page/release-notes/mobile-apps/now-mobile/image/now-mobile-icon.png",
@@ -21,21 +20,21 @@ func fBindings(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c 
 
 	connectionCommand := getConnectBinding()
 
-	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, claims.ActingUserID) {
+	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
 		connectionCommand = getDisconnectBinding()
 	}
 
 	commands.Bindings = append(commands.Bindings, connectionCommand)
 	client := mattermostclient.NewMMClient(c.Context.BotUserID, c.Context.BotAccessToken, c.Context.MattermostSiteURL)
 
-	user, err := client.GetUser(claims.ActingUserID)
+	user, err := client.GetUser(c.Context.ActingUserID)
 	if err == nil && user.IsSystemAdmin() {
 		commands.Bindings = append(commands.Bindings, getSysAdminCommandBindings())
 	}
 
 	out := []*apps.Binding{}
 
-	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, claims.ActingUserID) {
+	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
 		postBindings, commandBindings, headerBindings := app.GetTablesBindings(c.Context.MattermostSiteURL)
 		if postBindings != nil {
 			out = append(out, &apps.Binding{
