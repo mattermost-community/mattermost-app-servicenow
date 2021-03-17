@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/server/api"
 	"github.com/mattermost/mattermost-plugin-apps/server/utils/md"
 
 	"github.com/mattermost/mattermost-app-servicenow/config"
@@ -12,7 +11,7 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
-func fInstall(w http.ResponseWriter, r *http.Request, claims *api.JWTClaims, c *apps.Call) {
+func fInstall(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	response := apps.CallResponse{}
 	if c.Type != apps.CallTypeSubmit {
 		response.Type = apps.CallResponseTypeError
