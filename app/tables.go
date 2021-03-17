@@ -1,12 +1,11 @@
 package app
 
 import (
-	"strings"
-
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
+	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
 func GetTablesBindings(siteURL string) (post, command, header *apps.Binding) {
@@ -21,15 +20,11 @@ func GetTablesBindings(siteURL string) (post, command, header *apps.Binding) {
 	return
 }
 
-func getIconURL(siteURL, name string) string {
-	return strings.TrimRight(siteURL, "/") + "/plugins/com.mattermost.apps/api/v1/static/com.mattermost.servicenow/" + name
-}
-
 func baseBinding(siteURL, label string) *apps.Binding {
 	return &apps.Binding{
 		Location: constants.BindingPathCreate,
 		Label:    label,
-		Icon:     getIconURL(siteURL, "now-mobile-icon.png"),
+		Icon:     utils.GetIconURL(siteURL, "now-mobile-icon.png"),
 		Bindings: []*apps.Binding{},
 	}
 }
@@ -57,7 +52,7 @@ func subBindings(siteURL string, tt config.TablesConfig, base *apps.Binding, use
 		base.Bindings = append(base.Bindings, &apps.Binding{
 			Location: apps.Location(t.ID),
 			Label:    label,
-			Icon:     getIconURL(siteURL, "now-mobile-icon.png"),
+			Icon:     utils.GetIconURL(siteURL, "now-mobile-icon.png"),
 			Call: &apps.Call{
 				Path: t.ID,
 			},
