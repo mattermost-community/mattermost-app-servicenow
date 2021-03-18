@@ -38,6 +38,4 @@ const (
 	OAuthStateGCTicker = 30 * time.Second
 
 	MattermostURL = "http://localhost:8065"
-
-	TableIDGetField = "table"
 )

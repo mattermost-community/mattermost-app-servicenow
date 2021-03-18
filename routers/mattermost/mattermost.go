@@ -17,6 +17,7 @@ import (
 
 var ErrUnexpectedSignMethod = errors.New("unexpected signing method")
 var ErrMissingHeader = errors.Errorf("missing %s: Bearer header", apps.OutgoingAuthHeader)
+var ErrActingUserMismatch = errors.New("JWT claim doesn't match actingUserID in context")
 
 type callHandler func(http.ResponseWriter, *http.Request, *apps.CallRequest)
 
@@ -53,7 +54,7 @@ func extractCall(f callHandler, localMode bool) http.HandlerFunc {
 			}
 
 			if data.Context.ActingUserID != "" && data.Context.ActingUserID != claims.ActingUserID {
-				utils.WriteBadRequestError(rw, errors.New("JWT claim doesn't match actingUserID in context"))
+				utils.WriteBadRequestError(rw, ErrActingUserMismatch)
 				return
 			}
 		}

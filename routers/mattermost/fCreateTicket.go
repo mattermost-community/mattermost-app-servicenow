@@ -23,8 +23,11 @@ func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 		return
 	}
 
-	table := r.URL.Query().Get(constants.TableIDGetField)
-	action := r.URL.Query().Get(string(formActionQueryField))
+	callState := CreateTicketCallState{}
+	callState.FromState(c.State)
+
+	table := callState.Table
+	action := callState.Action
 
 	t, found := config.GetTables()[table]
 	if !found {
@@ -32,7 +35,7 @@ func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 	}
 
 	// Modal submits the information
-	if action == string(formActionSubmit) {
+	if action == formActionSubmit {
 		id, err := submitTicket(c.Context.ActingUserID, table, c)
 		if err != nil {
 			utils.WriteCallErrorResponse(w, fmt.Sprintf("Could not create the ticket. Error: %s", err.Error()))
@@ -77,7 +80,10 @@ func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallReque
 		return
 	}
 
-	table := r.URL.Query().Get(constants.TableIDGetField)
+	callState := CreateTicketCallState{}
+	callState.FromState(c.State)
+
+	table := callState.Table
 
 	t, found := config.GetTables()[table]
 	if !found {
@@ -88,8 +94,6 @@ func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallReque
 		Type: apps.CallResponseTypeForm,
 		Form: getCreateTicketForm(t.Fields, table, formActionOpen),
 	})
-
-	return
 }
 
 func getCreateTicketForm(fields []*apps.Field, table string, action formAction) *apps.Form {
@@ -111,12 +115,11 @@ func submitTicket(userID, table string, call *apps.CallRequest) (string, error) 
 
 func getCreateTicketCall(table string, action formAction) *apps.Call {
 	return &apps.Call{
-		Path: fmt.Sprintf("%s?%s=%s&%s=%s",
-			constants.BindingPathCreate,
-			constants.TableIDGetField,
-			table,
-			formActionQueryField,
-			action),
+		Path:   string(constants.BindingPathCreate),
 		Expand: &apps.Expand{Post: apps.ExpandAll},
+		State: CreateTicketCallState{
+			Action: action,
+			Table:  table,
+		},
 	}
 }

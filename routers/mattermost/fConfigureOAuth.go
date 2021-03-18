@@ -1,7 +1,6 @@
 package mattermost
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
@@ -23,9 +22,12 @@ func fConfigureOAuthSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallR
 		return
 	}
 
-	action := r.URL.Query().Get(string(formActionQueryField))
+	callState := ConfigureOAuthCallState{}
+	callState.FromState(c.State)
 
-	if action == string(formActionSubmit) {
+	action := callState.Action
+
+	if action == formActionSubmit {
 		config.SetServiceNowInstance(c.GetValue(configureOAuthServiceNowInstanceValue, ""))
 		config.SetOAuthConfig(config.OAuthConfig{
 			ClientID:     c.GetValue(configureOAuthClientIDValue, ""),
@@ -90,7 +92,10 @@ func getConfigureOAuthForm(v map[string]interface{}, action formAction) *apps.Fo
 
 func getConfigureOAuthCall(action formAction) *apps.Call {
 	return &apps.Call{
-		Path:   fmt.Sprintf("%s?%s=%s", constants.BindingPathConfigureOAuth, formActionQueryField, action),
+		Path:   string(constants.BindingPathConfigureOAuth),
 		Expand: &apps.Expand{ActingUser: apps.ExpandAll},
+		State: ConfigureOAuthCallState{
+			Action: action,
+		},
 	}
 }
