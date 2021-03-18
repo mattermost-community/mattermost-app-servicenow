@@ -6,7 +6,9 @@
     "description": "ServiceNow integration",
     "homepage_url": "https://github.com/mattermost/mattermost-app-servicenow",
     "root_url": "",
-    "requested_permissions": [],
+    "requested_permissions": [
+        "act_as_bot"
+    ],
     "requested_locations": [
         "/command",
         "/channel_header",

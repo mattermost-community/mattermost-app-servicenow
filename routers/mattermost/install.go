@@ -22,6 +22,7 @@ func fInstall(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	config.SetLocalConfig(config.LocalConfig{
 		BaseURL:        config.Local().BaseURL,
 		MattermostURL:  c.Context.MattermostSiteURL,
+		BotID:          c.Context.BotUserID,
 		BotAccessToken: c.Context.BotAccessToken,
 	})
 

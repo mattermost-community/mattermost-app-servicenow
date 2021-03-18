@@ -22,6 +22,7 @@ type LocalConfig struct {
 	BaseURL        string
 	MattermostURL  string
 	BotAccessToken string
+	BotID          string
 }
 
 func ServiceNowInstance() string {
@@ -69,7 +70,7 @@ func save(c config) {
 		return
 	}
 
-	err = store.SaveConfig(dat, lc.BotAccessToken, lc.MattermostURL)
+	err = store.SaveConfig(dat, lc.BotAccessToken, lc.MattermostURL, lc.BotID)
 	if err != nil {
 		log.Printf("Could not store config: %v", err)
 	}
@@ -79,7 +80,7 @@ func load() config {
 	defaultConfig := config{}
 	lc := loadLocal()
 
-	dat, err := store.LoadConfig(lc.BotAccessToken, lc.MattermostURL)
+	dat, err := store.LoadConfig(lc.BotAccessToken, lc.MattermostURL, lc.BotID)
 	if err != nil {
 		log.Printf("Could not load config: %v", err)
 		return defaultConfig

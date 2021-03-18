@@ -29,7 +29,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 
 	connectionCommand := getConnectBinding(mattermostSiteURL, appID)
 
-	if app.IsUserConnected(c.Context.BotAccessToken, mattermostSiteURL, c.Context.ActingUserID) {
+	if app.IsUserConnected(c.Context.BotAccessToken, mattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
 		connectionCommand = getDisconnectBinding()
 	}
 
@@ -42,7 +42,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 
 	out := []*apps.Binding{}
 
-	if app.IsUserConnected(c.Context.BotAccessToken, mattermostSiteURL, c.Context.ActingUserID) {
+	if app.IsUserConnected(c.Context.BotAccessToken, mattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
 		postBindings, commandBindings, headerBindings := app.GetTablesBindings(mattermostSiteURL, appID)
 		if postBindings != nil {
 			out = append(out, &apps.Binding{

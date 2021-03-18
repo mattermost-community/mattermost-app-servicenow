@@ -11,15 +11,17 @@ import (
 
 type KVClient struct {
 	client *http.Client
+	botID  string
 	token  string
 	url    string
 }
 
-func NewKVClient(botAccessToken string, baseURL string) *KVClient {
+func NewKVClient(botAccessToken string, baseURL string, botID string) *KVClient {
 	return &KVClient{
 		client: http.DefaultClient,
 		token:  botAccessToken,
 		url:    baseURL,
+		botID:  botID,
 	}
 }
 
@@ -97,6 +99,7 @@ func (c *KVClient) newRequest(key string, body io.Reader, method string) (*http.
 	}
 
 	req.Header.Set("Authorization", "BEARER"+" "+c.token)
+	req.Header.Set("Mattermost-User-Id", c.botID)
 
 	if err := req.ParseForm(); err != nil {
 		return nil, err

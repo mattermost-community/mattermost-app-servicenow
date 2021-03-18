@@ -11,7 +11,7 @@ import (
 )
 
 func fDisconnect(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
-	store.DeleteToken(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID)
+	store.DeleteToken(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.BotUserID, c.Context.ActingUserID)
 	utils.WriteCallStandardResponse(w, "You are disconnected from Service Now.")
 }
 

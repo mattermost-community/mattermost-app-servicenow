@@ -18,7 +18,7 @@ import (
 var ErrCannotCreateClient = errors.New("cannot create client")
 
 func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
-	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
+	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
 		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
 		return
 	}
@@ -75,7 +75,7 @@ func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 }
 
 func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
-	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
+	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
 		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
 		return
 	}
@@ -105,7 +105,7 @@ func getCreateTicketForm(fields []*apps.Field, table string, action formAction) 
 }
 
 func submitTicket(userID, table string, call *apps.CallRequest) (string, error) {
-	c := servicenowclient.NewClient(call.Context.BotAccessToken, call.Context.MattermostSiteURL, userID)
+	c := servicenowclient.NewClient(call.Context.BotAccessToken, call.Context.MattermostSiteURL, call.Context.BotUserID, userID)
 	if c == nil {
 		return "", ErrCannotCreateClient
 	}

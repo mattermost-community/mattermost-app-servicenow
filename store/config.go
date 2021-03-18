@@ -7,8 +7,8 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 )
 
-func SaveConfig(conf []byte, botAccessToken, baseURL string) error {
-	c := mattermostclient.NewKVClient(botAccessToken, baseURL)
+func SaveConfig(conf []byte, botAccessToken, baseURL, botID string) error {
+	c := mattermostclient.NewKVClient(botAccessToken, baseURL, botID)
 	err := c.KVSet("config", map[string]interface{}{"config": conf})
 
 	if err != nil {
@@ -18,8 +18,8 @@ func SaveConfig(conf []byte, botAccessToken, baseURL string) error {
 	return nil
 }
 
-func LoadConfig(botAccessToken, baseURL string) ([]byte, error) {
-	c := mattermostclient.NewKVClient(botAccessToken, baseURL)
+func LoadConfig(botAccessToken, baseURL, botID string) ([]byte, error) {
+	c := mattermostclient.NewKVClient(botAccessToken, baseURL, botID)
 	stored := map[string][]byte{}
 
 	err := c.KVGet("config", &stored)

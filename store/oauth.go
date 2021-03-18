@@ -9,21 +9,21 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/clients/mattermostclient"
 )
 
-func SaveState(botAccessToken, baseURL, state string) {
-	states := loadStates(botAccessToken, baseURL)
+func SaveState(botAccessToken, baseURL, state, botID string) {
+	states := loadStates(botAccessToken, baseURL, botID)
 	states[state] = time.Now()
-	saveStates(botAccessToken, baseURL, states)
+	saveStates(botAccessToken, baseURL, botID, states)
 }
 
-func VerifyState(botAccessToken, baseURL, state string) bool {
-	states := loadStates(botAccessToken, baseURL)
+func VerifyState(botAccessToken, baseURL, state, botID string) bool {
+	states := loadStates(botAccessToken, baseURL, botID)
 	_, found := states[state]
 
 	return found
 }
 
-func saveStates(botAccessToken, baseURL string, states map[string]time.Time) {
-	c := mattermostclient.NewKVClient(botAccessToken, baseURL)
+func saveStates(botAccessToken, baseURL, botID string, states map[string]time.Time) {
+	c := mattermostclient.NewKVClient(botAccessToken, baseURL, botID)
 
 	err := c.KVSet("states", states)
 	if err != nil {
@@ -32,10 +32,10 @@ func saveStates(botAccessToken, baseURL string, states map[string]time.Time) {
 	}
 }
 
-func loadStates(botAccessToken, baseURL string) map[string]time.Time {
+func loadStates(botAccessToken, baseURL, botID string) map[string]time.Time {
 	defaultStates := map[string]time.Time{}
 	states := map[string]time.Time{}
-	c := mattermostclient.NewKVClient(botAccessToken, baseURL)
+	c := mattermostclient.NewKVClient(botAccessToken, baseURL, botID)
 
 	err := c.KVGet("states", &states)
 	if err != nil {
@@ -46,27 +46,27 @@ func loadStates(botAccessToken, baseURL string) map[string]time.Time {
 	return states
 }
 
-func SaveToken(botAccessToken, baseURL string, token *oauth2.Token, userID string) {
-	tokens := loadTokens(botAccessToken, baseURL)
+func SaveToken(botAccessToken, baseURL, botID string, token *oauth2.Token, userID string) {
+	tokens := loadTokens(botAccessToken, baseURL, botID)
 	tokens[userID] = token
-	saveTokens(botAccessToken, baseURL, tokens)
+	saveTokens(botAccessToken, baseURL, botID, tokens)
 }
 
-func GetToken(botAccessToken, baseURL string, userID string) (*oauth2.Token, bool) {
-	tokens := loadTokens(botAccessToken, baseURL)
+func GetToken(botAccessToken, baseURL, botID string, userID string) (*oauth2.Token, bool) {
+	tokens := loadTokens(botAccessToken, baseURL, botID)
 	token, found := tokens[userID]
 
 	return token, found
 }
 
-func DeleteToken(botAccessToken, baseURL string, userID string) {
-	tokens := loadTokens(botAccessToken, baseURL)
+func DeleteToken(botAccessToken, baseURL, botID string, userID string) {
+	tokens := loadTokens(botAccessToken, baseURL, botID)
 	delete(tokens, userID)
-	saveTokens(botAccessToken, baseURL, tokens)
+	saveTokens(botAccessToken, baseURL, botID, tokens)
 }
 
-func saveTokens(botAccessToken, baseURL string, tokens map[string]*oauth2.Token) {
-	c := mattermostclient.NewKVClient(botAccessToken, baseURL)
+func saveTokens(botAccessToken, baseURL, botID string, tokens map[string]*oauth2.Token) {
+	c := mattermostclient.NewKVClient(botAccessToken, baseURL, botID)
 
 	err := c.KVSet("tokens", tokens)
 	if err != nil {
@@ -75,10 +75,10 @@ func saveTokens(botAccessToken, baseURL string, tokens map[string]*oauth2.Token)
 	}
 }
 
-func loadTokens(botAccessToken, baseURL string) map[string]*oauth2.Token {
+func loadTokens(botAccessToken, baseURL, botID string) map[string]*oauth2.Token {
 	defaultTokens := map[string]*oauth2.Token{}
 	tokens := map[string]*oauth2.Token{}
-	c := mattermostclient.NewKVClient(botAccessToken, baseURL)
+	c := mattermostclient.NewKVClient(botAccessToken, baseURL, botID)
 
 	err := c.KVGet("tokens", &tokens)
 	if err != nil {

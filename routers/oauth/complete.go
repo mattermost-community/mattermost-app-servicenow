@@ -21,7 +21,7 @@ func oauth2Complete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	state := r.URL.Query().Get("state")
-	if !store.VerifyState(conf.BotAccessToken, conf.MattermostURL, state) {
+	if !store.VerifyState(conf.BotAccessToken, conf.MattermostURL, state, conf.BotID) {
 		http.Error(w, "State not found", http.StatusBadRequest)
 		return
 	}
@@ -40,7 +40,7 @@ func oauth2Complete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	store.SaveToken(conf.BotAccessToken, conf.MattermostURL, token, userID)
+	store.SaveToken(conf.BotAccessToken, conf.MattermostURL, conf.BotID, token, userID)
 
 	connectedString := "You have successfully connected the ServiceNow Mattermost App to ServiceNow. " +
 		"Please close this window."
