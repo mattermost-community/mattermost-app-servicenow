@@ -17,18 +17,9 @@ const (
 	configureOAuthServiceNowInstanceValue = "instance"
 )
 
-func fConfigureOAuth(w http.ResponseWriter, r *http.Request, c *apps.Call) {
+func fConfigureOAuthSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	if !c.Context.ExpandedContext.ActingUser.IsSystemAdmin() {
 		utils.WriteCallErrorResponse(w, "You must be a system admin to configure oauth.")
-		return
-	}
-
-	if c.Type == apps.CallTypeForm {
-		utils.WriteCallResponse(w, apps.CallResponse{
-			Type: apps.CallResponseTypeForm,
-			Form: getConfigureOAuthForm(nil, formActionOpen),
-		})
-
 		return
 	}
 
@@ -49,6 +40,18 @@ func fConfigureOAuth(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	utils.WriteCallResponse(w, apps.CallResponse{
 		Type: apps.CallResponseTypeForm,
 		Form: getConfigureOAuthForm(c.Values, formActionSubmit),
+	})
+}
+
+func fConfigureOAuthForm(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
+	if !c.Context.ExpandedContext.ActingUser.IsSystemAdmin() {
+		utils.WriteCallErrorResponse(w, "You must be a system admin to configure oauth.")
+		return
+	}
+
+	utils.WriteCallResponse(w, apps.CallResponse{
+		Type: apps.CallResponseTypeForm,
+		Form: getConfigureOAuthForm(nil, formActionOpen),
 	})
 }
 

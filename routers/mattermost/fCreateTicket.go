@@ -17,7 +17,7 @@ import (
 
 var ErrCannotCreateClient = errors.New("cannot create client")
 
-func fCreateTicket(w http.ResponseWriter, r *http.Request, c *apps.Call) {
+func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
 		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
 		return
@@ -29,16 +29,6 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	t, found := config.GetTables()[table]
 	if !found {
 		utils.WriteCallErrorResponse(w, "Table definition not found.")
-	}
-
-	// Command is asking for the form definition
-	if c.Type == apps.CallTypeForm {
-		utils.WriteCallResponse(w, apps.CallResponse{
-			Type: apps.CallResponseTypeForm,
-			Form: getCreateTicketForm(t.Fields, table, formActionOpen),
-		})
-
-		return
 	}
 
 	// Modal submits the information
@@ -81,6 +71,27 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	})
 }
 
+func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
+	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
+		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
+		return
+	}
+
+	table := r.URL.Query().Get(constants.TableIDGetField)
+
+	t, found := config.GetTables()[table]
+	if !found {
+		utils.WriteCallErrorResponse(w, "Table definition not found.")
+	}
+
+	utils.WriteCallResponse(w, apps.CallResponse{
+		Type: apps.CallResponseTypeForm,
+		Form: getCreateTicketForm(t.Fields, table, formActionOpen),
+	})
+
+	return
+}
+
 func getCreateTicketForm(fields []*apps.Field, table string, action formAction) *apps.Form {
 	return &apps.Form{
 		Title:  "Create ticket",
@@ -89,7 +100,7 @@ func getCreateTicketForm(fields []*apps.Field, table string, action formAction) 
 	}
 }
 
-func submitTicket(userID, table string, call *apps.Call) (string, error) {
+func submitTicket(userID, table string, call *apps.CallRequest) (string, error) {
 	c := servicenowclient.NewClient(call.Context.BotAccessToken, call.Context.MattermostSiteURL, userID)
 	if c == nil {
 		return "", ErrCannotCreateClient

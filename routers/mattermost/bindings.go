@@ -11,7 +11,7 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
-func fBindings(w http.ResponseWriter, r *http.Request, c *apps.Call) {
+func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	mattermostSiteURL := c.Context.MattermostSiteURL
 	baseCommand := &apps.Binding{
 		Label:       "servicenow",

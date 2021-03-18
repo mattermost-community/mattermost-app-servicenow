@@ -56,7 +56,7 @@ func main() {
 		}
 
 		manifest.HTTPRootURL = config.Local().BaseURL
-		manifest.Type = apps.AppTypeHTTP
+		manifest.AppType = apps.AppTypeHTTP
 
 		_ = http.ListenAndServe(addr, nil)
 

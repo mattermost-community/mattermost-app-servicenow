@@ -11,7 +11,7 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
-func fInstall(w http.ResponseWriter, r *http.Request, c *apps.Call) {
+func fInstall(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	response := apps.CallResponse{}
 	if c.Type != apps.CallTypeSubmit {
 		response.Type = apps.CallResponseTypeError

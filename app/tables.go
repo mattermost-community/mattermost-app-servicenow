@@ -22,7 +22,7 @@ func GetTablesBindings(siteURL string) (post, command, header *apps.Binding) {
 
 func baseBinding(siteURL, label string) *apps.Binding {
 	return &apps.Binding{
-		Location: constants.BindingPathCreate,
+		Location: constants.LocationCreate,
 		Label:    label,
 		Icon:     utils.GetIconURL(siteURL, "now-mobile-icon.png"),
 		Bindings: []*apps.Binding{},

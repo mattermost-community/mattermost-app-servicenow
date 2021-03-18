@@ -12,7 +12,7 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
-func fConnect(w http.ResponseWriter, r *http.Request, c *apps.Call) {
+func fConnect(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	state := utils.CreateOAuthState(c.Context.ActingUserID, c.Context.ChannelID)
 	conf := app.GetOAuthConfig()
 
@@ -21,5 +21,5 @@ func fConnect(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 }
 
 func getConnectCall() *apps.Call {
-	return &apps.Call{Path: constants.BindingPathConnect}
+	return &apps.Call{Path: string(constants.BindingPathConnect)}
 }
