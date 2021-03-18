@@ -26,7 +26,7 @@ type ConfigureOAuthCallState struct {
 	Action formAction `json:"action"`
 }
 
-func (s ConfigureOAuthCallState) FromState(i interface{}) {
+func (s *ConfigureOAuthCallState) FromState(i interface{}) {
 	if i == nil {
 		return
 	}

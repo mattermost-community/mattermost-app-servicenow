@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	configureOAuthClientIDValue           = "clientID"
-	configureOAuthClientSecretValue       = "clientSecret"
+	configureOAuthClientIDValue           = "client_id"
+	configureOAuthClientSecretValue       = "client_secret"
 	configureOAuthServiceNowInstanceValue = "instance"
 )
 

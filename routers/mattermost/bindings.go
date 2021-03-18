@@ -6,18 +6,18 @@ import (
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
-	"github.com/mattermost/mattermost-app-servicenow/clients/mattermostclient"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
 func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	mattermostSiteURL := c.Context.MattermostSiteURL
+	appID := c.Context.AppID
 	baseCommand := &apps.Binding{
 		Label:       "servicenow",
 		Location:    "servicenow",
 		Description: "Create incidents in your ServiceNow instance",
-		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png"),
+		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
 	}
 
 	commands := &apps.Binding{
@@ -27,24 +27,23 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 		},
 	}
 
-	connectionCommand := getConnectBinding(mattermostSiteURL)
+	connectionCommand := getConnectBinding(mattermostSiteURL, appID)
 
-	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
+	if app.IsUserConnected(c.Context.BotAccessToken, mattermostSiteURL, c.Context.ActingUserID) {
 		connectionCommand = getDisconnectBinding()
 	}
 
 	baseCommand.Bindings = append(baseCommand.Bindings, connectionCommand)
-	client := mattermostclient.NewMMClient(c.Context.BotUserID, c.Context.BotAccessToken, c.Context.MattermostSiteURL)
 
-	user, err := client.GetUser(c.Context.ActingUserID)
-	if err == nil && user.IsSystemAdmin() {
+	user := c.Context.ActingUser
+	if user != nil && user.IsSystemAdmin() {
 		baseCommand.Bindings = append(baseCommand.Bindings, getSysAdminCommandBindings())
 	}
 
 	out := []*apps.Binding{}
 
-	if app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
-		postBindings, commandBindings, headerBindings := app.GetTablesBindings(c.Context.MattermostSiteURL)
+	if app.IsUserConnected(c.Context.BotAccessToken, mattermostSiteURL, c.Context.ActingUserID) {
+		postBindings, commandBindings, headerBindings := app.GetTablesBindings(mattermostSiteURL, appID)
 		if postBindings != nil {
 			out = append(out, &apps.Binding{
 				Location: apps.LocationPostMenu,
@@ -100,11 +99,11 @@ func getSysAdminCommandBindings() *apps.Binding {
 		},
 	}
 }
-func getConnectBinding(mattermostSiteURL string) *apps.Binding {
+func getConnectBinding(mattermostSiteURL string, appID apps.AppID) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationConnect,
 		Label:       "connect",
-		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png"),
+		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
 		Hint:        "",
 		Description: "Connect your ServiceNow account",
 		Form:        &apps.Form{},
