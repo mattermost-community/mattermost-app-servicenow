@@ -88,6 +88,7 @@ func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallReque
 	t, found := config.GetTables()[table]
 	if !found {
 		utils.WriteCallErrorResponse(w, fmt.Sprintf("Table definition '%s' not found", table))
+		return
 	}
 
 	utils.WriteCallResponse(w, apps.CallResponse{
