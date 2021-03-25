@@ -9,7 +9,7 @@ type CreateTicketCallState struct {
 	Table  string     `json:"table"`
 }
 
-func (s CreateTicketCallState) FromState(i interface{}) {
+func (s *CreateTicketCallState) FromState(i interface{}) {
 	if i == nil {
 		return
 	}

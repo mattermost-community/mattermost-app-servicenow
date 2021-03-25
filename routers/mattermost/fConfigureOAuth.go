@@ -22,7 +22,7 @@ func fConfigureOAuthSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallR
 		return
 	}
 
-	callState := ConfigureOAuthCallState{}
+	callState := &ConfigureOAuthCallState{}
 	callState.FromState(c.State)
 
 	action := callState.Action

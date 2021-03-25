@@ -23,7 +23,7 @@ func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 		return
 	}
 
-	callState := CreateTicketCallState{}
+	callState := &CreateTicketCallState{}
 	callState.FromState(c.State)
 
 	table := callState.Table
@@ -31,7 +31,7 @@ func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 
 	t, found := config.GetTables()[table]
 	if !found {
-		utils.WriteCallErrorResponse(w, "Table definition not found.")
+		utils.WriteCallErrorResponse(w, fmt.Sprintf("Table definition '%s' not found", table))
 	}
 
 	// Modal submits the information
@@ -80,14 +80,14 @@ func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallReque
 		return
 	}
 
-	callState := CreateTicketCallState{}
+	callState := &CreateTicketCallState{}
 	callState.FromState(c.State)
 
 	table := callState.Table
 
 	t, found := config.GetTables()[table]
 	if !found {
-		utils.WriteCallErrorResponse(w, "Table definition not found.")
+		utils.WriteCallErrorResponse(w, fmt.Sprintf("Table definition '%s' not found", table))
 	}
 
 	utils.WriteCallResponse(w, apps.CallResponse{
