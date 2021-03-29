@@ -6,18 +6,27 @@
     "description": "ServiceNow integration",
     "homepage_url": "https://github.com/mattermost/mattermost-app-servicenow",
     "root_url": "",
-    "requested_permissions": [],
+    "requested_permissions": [
+        "act_as_bot"
+    ],
     "requested_locations": [
         "/command",
         "/channel_header",
         "/post_menu"
     ],
-    "functions": [
+    "aws_lambda": [
         {
+            "path": "/",
             "name": "go-function",
             "handler": "mattermost-app-servicenow",
             "runtime": "go1.x"
         }
     ],
+    "bindings": {
+        "path": "/bindings",
+        "expand": {
+            "acting_user": "all"
+        }
+    },
     "assets": []
 }

@@ -20,11 +20,11 @@ type Client struct {
 
 var ErrUnexpectedStatus = errors.New("returned with unexpected status")
 
-func NewClient(botAccessToken, baseURL, userID string) *Client {
+func NewClient(botAccessToken, baseURL, botID, userID string) *Client {
 	ctx := context.Background()
 	oAuthConf := app.GetOAuthConfig()
 
-	token, found := store.GetToken(botAccessToken, baseURL, userID)
+	token, found := store.GetToken(botAccessToken, baseURL, botID, userID)
 	if !found {
 		return nil
 	}

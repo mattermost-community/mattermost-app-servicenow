@@ -1,6 +1,10 @@
 package constants
 
-import "time"
+import (
+	"time"
+
+	"github.com/mattermost/mattermost-app-servicenow/utils"
+)
 
 const (
 	ManifestPath    = "/manifest"
@@ -12,10 +16,10 @@ const (
 	OAuthConnectPath  = "/connect"
 	OAuthCompletePath = "/complete"
 
-	BindingPathCreate         = "/create"
-	BindingPathConnect        = "/connect"
-	BindingPathDisconnect     = "/disconnect"
-	BindingPathConfigureOAuth = "/configure/oauth"
+	BindingPathCreate         utils.Path = "/create"
+	BindingPathConnect        utils.Path = "/connect"
+	BindingPathDisconnect     utils.Path = "/disconnect"
+	BindingPathConfigureOAuth utils.Path = "/configure/oauth"
 
 	LocationCreate         = "create"
 	LocationConnect        = "connect"
@@ -34,6 +38,4 @@ const (
 	OAuthStateGCTicker = 30 * time.Second
 
 	MattermostURL = "http://localhost:8065"
-
-	TableIDGetField = "table"
 )

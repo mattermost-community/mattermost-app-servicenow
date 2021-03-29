@@ -17,32 +17,25 @@ import (
 
 var ErrCannotCreateClient = errors.New("cannot create client")
 
-func fCreateTicket(w http.ResponseWriter, r *http.Request, c *apps.Call) {
-	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID) {
+func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
+	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
 		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
 		return
 	}
 
-	table := r.URL.Query().Get(constants.TableIDGetField)
-	action := r.URL.Query().Get(string(formActionQueryField))
+	callState := &CreateTicketCallState{}
+	callState.FromState(c.State)
+
+	table := callState.Table
+	action := callState.Action
 
 	t, found := config.GetTables()[table]
 	if !found {
-		utils.WriteCallErrorResponse(w, "Table definition not found.")
-	}
-
-	// Command is asking for the form definition
-	if c.Type == apps.CallTypeForm {
-		utils.WriteCallResponse(w, apps.CallResponse{
-			Type: apps.CallResponseTypeForm,
-			Form: getCreateTicketForm(t.Fields, table, formActionOpen),
-		})
-
-		return
+		utils.WriteCallErrorResponse(w, fmt.Sprintf("Table definition '%s' not found", table))
 	}
 
 	// Modal submits the information
-	if action == string(formActionSubmit) {
+	if action == formActionSubmit {
 		id, err := submitTicket(c.Context.ActingUserID, table, c)
 		if err != nil {
 			utils.WriteCallErrorResponse(w, fmt.Sprintf("Could not create the ticket. Error: %s", err.Error()))
@@ -81,6 +74,29 @@ func fCreateTicket(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	})
 }
 
+func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
+	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
+		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
+		return
+	}
+
+	callState := &CreateTicketCallState{}
+	callState.FromState(c.State)
+
+	table := callState.Table
+
+	t, found := config.GetTables()[table]
+	if !found {
+		utils.WriteCallErrorResponse(w, fmt.Sprintf("Table definition '%s' not found", table))
+		return
+	}
+
+	utils.WriteCallResponse(w, apps.CallResponse{
+		Type: apps.CallResponseTypeForm,
+		Form: getCreateTicketForm(t.Fields, table, formActionOpen),
+	})
+}
+
 func getCreateTicketForm(fields []*apps.Field, table string, action formAction) *apps.Form {
 	return &apps.Form{
 		Title:  "Create ticket",
@@ -89,8 +105,8 @@ func getCreateTicketForm(fields []*apps.Field, table string, action formAction) 
 	}
 }
 
-func submitTicket(userID, table string, call *apps.Call) (string, error) {
-	c := servicenowclient.NewClient(call.Context.BotAccessToken, call.Context.MattermostSiteURL, userID)
+func submitTicket(userID, table string, call *apps.CallRequest) (string, error) {
+	c := servicenowclient.NewClient(call.Context.BotAccessToken, call.Context.MattermostSiteURL, call.Context.BotUserID, userID)
 	if c == nil {
 		return "", ErrCannotCreateClient
 	}
@@ -100,12 +116,11 @@ func submitTicket(userID, table string, call *apps.Call) (string, error) {
 
 func getCreateTicketCall(table string, action formAction) *apps.Call {
 	return &apps.Call{
-		Path: fmt.Sprintf("%s?%s=%s&%s=%s",
-			constants.BindingPathCreate,
-			constants.TableIDGetField,
-			table,
-			formActionQueryField,
-			action),
+		Path:   string(constants.BindingPathCreate),
 		Expand: &apps.Expand{Post: apps.ExpandAll},
+		State: CreateTicketCallState{
+			Action: action,
+			Table:  table,
+		},
 	}
 }

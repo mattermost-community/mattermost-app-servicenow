@@ -8,28 +8,28 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
-func GetTablesBindings(siteURL string) (post, command, header *apps.Binding) {
+func GetTablesBindings(siteURL string, appID apps.AppID) (post, command, header *apps.Binding) {
 	pt, ct, ht := filterTables(config.GetTables())
-	pb := baseBinding(siteURL, "Create Ticket")
-	cb := baseBinding(siteURL, "create-ticket")
-	hb := baseBinding(siteURL, "Create Ticket")
-	post = subBindings(siteURL, pt, pb, false)
-	command = subBindings(siteURL, ct, cb, true)
-	header = subBindings(siteURL, ht, hb, false)
+	pb := baseBinding(siteURL, "Create Ticket", appID)
+	cb := baseBinding(siteURL, "create-ticket", appID)
+	hb := baseBinding(siteURL, "Create Ticket", appID)
+	post = subBindings(siteURL, pt, pb, false, appID)
+	command = subBindings(siteURL, ct, cb, true, appID)
+	header = subBindings(siteURL, ht, hb, false, appID)
 
 	return
 }
 
-func baseBinding(siteURL, label string) *apps.Binding {
+func baseBinding(siteURL, label string, appID apps.AppID) *apps.Binding {
 	return &apps.Binding{
-		Location: constants.BindingPathCreate,
+		Location: constants.LocationCreate,
 		Label:    label,
-		Icon:     utils.GetIconURL(siteURL, "now-mobile-icon.png"),
+		Icon:     utils.GetIconURL(siteURL, "now-mobile-icon.png", appID),
 		Bindings: []*apps.Binding{},
 	}
 }
 
-func subBindings(siteURL string, tt config.TablesConfig, base *apps.Binding, useLocationLabel bool) *apps.Binding {
+func subBindings(siteURL string, tt config.TablesConfig, base *apps.Binding, useLocationLabel bool, appID apps.AppID) *apps.Binding {
 	switch len(tt) {
 	case 0:
 		return nil
@@ -52,7 +52,7 @@ func subBindings(siteURL string, tt config.TablesConfig, base *apps.Binding, use
 		base.Bindings = append(base.Bindings, &apps.Binding{
 			Location: apps.Location(t.ID),
 			Label:    label,
-			Icon:     utils.GetIconURL(siteURL, "now-mobile-icon.png"),
+			Icon:     utils.GetIconURL(siteURL, "now-mobile-icon.png", appID),
 			Call: &apps.Call{
 				Path: t.ID,
 			},

@@ -1,7 +1,6 @@
 package mattermost
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
@@ -12,29 +11,23 @@ import (
 )
 
 const (
-	configureOAuthClientIDValue           = "clientID"
-	configureOAuthClientSecretValue       = "clientSecret"
+	configureOAuthClientIDValue           = "client_id"
+	configureOAuthClientSecretValue       = "client_secret"
 	configureOAuthServiceNowInstanceValue = "instance"
 )
 
-func fConfigureOAuth(w http.ResponseWriter, r *http.Request, c *apps.Call) {
+func fConfigureOAuthSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	if !c.Context.ExpandedContext.ActingUser.IsSystemAdmin() {
 		utils.WriteCallErrorResponse(w, "You must be a system admin to configure oauth.")
 		return
 	}
 
-	if c.Type == apps.CallTypeForm {
-		utils.WriteCallResponse(w, apps.CallResponse{
-			Type: apps.CallResponseTypeForm,
-			Form: getConfigureOAuthForm(nil, formActionOpen),
-		})
+	callState := &ConfigureOAuthCallState{}
+	callState.FromState(c.State)
 
-		return
-	}
+	action := callState.Action
 
-	action := r.URL.Query().Get(string(formActionQueryField))
-
-	if action == string(formActionSubmit) {
+	if action == formActionSubmit {
 		config.SetServiceNowInstance(c.GetValue(configureOAuthServiceNowInstanceValue, ""))
 		config.SetOAuthConfig(config.OAuthConfig{
 			ClientID:     c.GetValue(configureOAuthClientIDValue, ""),
@@ -49,6 +42,18 @@ func fConfigureOAuth(w http.ResponseWriter, r *http.Request, c *apps.Call) {
 	utils.WriteCallResponse(w, apps.CallResponse{
 		Type: apps.CallResponseTypeForm,
 		Form: getConfigureOAuthForm(c.Values, formActionSubmit),
+	})
+}
+
+func fConfigureOAuthForm(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
+	if !c.Context.ExpandedContext.ActingUser.IsSystemAdmin() {
+		utils.WriteCallErrorResponse(w, "You must be a system admin to configure oauth.")
+		return
+	}
+
+	utils.WriteCallResponse(w, apps.CallResponse{
+		Type: apps.CallResponseTypeForm,
+		Form: getConfigureOAuthForm(nil, formActionOpen),
 	})
 }
 
@@ -87,7 +92,10 @@ func getConfigureOAuthForm(v map[string]interface{}, action formAction) *apps.Fo
 
 func getConfigureOAuthCall(action formAction) *apps.Call {
 	return &apps.Call{
-		Path:   fmt.Sprintf("%s?%s=%s", constants.BindingPathConfigureOAuth, formActionQueryField, action),
+		Path:   string(constants.BindingPathConfigureOAuth),
 		Expand: &apps.Expand{ActingUser: apps.ExpandAll},
+		State: ConfigureOAuthCallState{
+			Action: action,
+		},
 	}
 }
