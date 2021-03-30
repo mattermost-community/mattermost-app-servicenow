@@ -16,7 +16,7 @@ build:
 .PHONY: run
 ## run: runs the service
 run: build
-	LOCAL=true ./dist/mattermost-app-servicenow ${BASE} ${ADDR}
+	LOCAL=true ./dist/mattermost-app-servicenow ${BASE} ${ADDR} -v
 
 .PHONY: test
 ## test: tests all packages
