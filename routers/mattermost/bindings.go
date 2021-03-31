@@ -30,14 +30,14 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	connectionCommand := getConnectBinding(mattermostSiteURL, appID)
 
 	if app.IsUserConnected(c.Context.BotAccessToken, mattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
-		connectionCommand = getDisconnectBinding()
+		connectionCommand = getDisconnectBinding(mattermostSiteURL, appID)
 	}
 
 	baseCommand.Bindings = append(baseCommand.Bindings, connectionCommand)
 
 	user := c.Context.ActingUser
 	if user != nil && user.IsSystemAdmin() {
-		baseCommand.Bindings = append(baseCommand.Bindings, getSysAdminCommandBindings())
+		baseCommand.Bindings = append(baseCommand.Bindings, getSysAdminCommandBindings(mattermostSiteURL, appID))
 	}
 
 	out := []*apps.Binding{}
@@ -80,18 +80,18 @@ func generateTableBindingsCalls(b *apps.Binding) *apps.Binding {
 	return b
 }
 
-func getSysAdminCommandBindings() *apps.Binding {
+func getSysAdminCommandBindings(mattermostSiteURL string, appID apps.AppID) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationConfigure,
 		Label:       "config",
-		Icon:        "",
+		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
 		Hint:        "",
 		Description: "Configure the plugin",
 		Bindings: []*apps.Binding{
 			{
 				Location:    constants.LocationConfigureOAuth,
 				Label:       "oauth",
-				Icon:        "",
+				Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
 				Hint:        "",
 				Description: "Configure OAuth options",
 				Call:        getConfigureOAuthCall(formActionOpen),
@@ -111,11 +111,11 @@ func getConnectBinding(mattermostSiteURL string, appID apps.AppID) *apps.Binding
 	}
 }
 
-func getDisconnectBinding() *apps.Binding {
+func getDisconnectBinding(mattermostSiteURL string, appID apps.AppID) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationDisconnect,
 		Label:       "disconnect",
-		Icon:        "",
+		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
 		Hint:        "",
 		Description: "Disconnect from ServiceNow",
 		Form:        &apps.Form{},
