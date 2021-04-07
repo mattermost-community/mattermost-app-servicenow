@@ -12,6 +12,8 @@ require (
 	github.com/mattermost/mattermost-plugin-apps v0.1.1-0.20210317233923-e9f3d5d88d90
 	github.com/mattermost/mattermost-server/v5 v5.3.2-0.20210120031517-5a7759f4d63b
 	github.com/pkg/errors v0.9.1
+	github.com/sirupsen/logrus v1.8.1
+	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0 // indirect
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
 	golang.org/x/mod v0.4.1 // indirect
