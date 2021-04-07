@@ -25,6 +25,8 @@ func Init(router *mux.Router, m *apps.Manifest, staticAssets fs.FS, localMode bo
 	router.HandleFunc(constants.ManifestPath, fManifest(m))
 	router.HandleFunc(constants.InstallPath, extractCall(fInstall, localMode))
 	router.HandleFunc(constants.BindingsPath, extractCall(fBindings, localMode))
+	router.HandleFunc(constants.OAuthPath+constants.OAuthConnectPath, extractCall(fOAuthConnect, localMode))
+	router.HandleFunc(constants.OAuthPath+constants.OAuthCompletePath, extractCall(fOAuthComplete, localMode))
 
 	router.HandleFunc(constants.BindingPathCreate.Submit(), extractCall(fCreateTicketSubmit, localMode))
 	router.HandleFunc(constants.BindingPathCreate.Form(), extractCall(fCreateTicketForm, localMode))

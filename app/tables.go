@@ -8,8 +8,11 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
-func GetTablesBindings(siteURL string, appID apps.AppID) (post, command, header *apps.Binding) {
-	pt, ct, ht := filterTables(config.GetTables())
+func GetTablesBindings(cc *apps.Context) (post, command, header *apps.Binding) {
+	siteURL := cc.MattermostSiteURL
+	appID := cc.AppID
+
+	pt, ct, ht := filterTables(config.GetTables(cc))
 	pb := baseBinding(siteURL, "Create Ticket", appID)
 	cb := baseBinding(siteURL, "create-ticket", appID)
 	hb := baseBinding(siteURL, "Create Ticket", appID)

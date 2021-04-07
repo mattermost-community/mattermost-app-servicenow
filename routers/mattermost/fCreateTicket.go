@@ -18,32 +18,32 @@ import (
 var ErrCannotCreateClient = errors.New("cannot create client")
 
 func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
-	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
+	if !app.IsUserConnected(c.Context) {
 		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
 		return
 	}
 
-	callState := &CreateTicketCallState{}
+	callState := &createTicketCallState{}
 	callState.FromState(c.State)
 
 	table := callState.Table
 	action := callState.Action
 
-	t, found := config.GetTables()[table]
+	t, found := config.GetTables(c.Context)[table]
 	if !found {
 		utils.WriteCallErrorResponse(w, fmt.Sprintf("Table definition '%s' not found", table))
 	}
 
 	// Modal submits the information
 	if action == formActionSubmit {
-		id, err := submitTicket(c.Context.ActingUserID, table, c)
+		id, err := submitTicket(table, c)
 		if err != nil {
 			utils.WriteCallErrorResponse(w, fmt.Sprintf("Could not create the ticket. Error: %s", err.Error()))
 			return
 		}
 
 		navToURI := fmt.Sprintf("/%s?sys_id=%s", table, url.QueryEscape(id))
-		ticketLink := fmt.Sprintf("%s/nav_to.do?uri=%s", config.ServiceNowInstance(), url.QueryEscape(navToURI))
+		ticketLink := fmt.Sprintf("%s/nav_to.do?uri=%s", config.ServiceNowInstance(c.Context), url.QueryEscape(navToURI))
 		utils.WriteCallStandardResponse(w, fmt.Sprintf("Ticket created with [sys_id %s](%s).", id, ticketLink))
 
 		return
@@ -75,17 +75,17 @@ func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 }
 
 func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
-	if !app.IsUserConnected(c.Context.BotAccessToken, c.Context.MattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
+	if !app.IsUserConnected(c.Context) {
 		utils.WriteCallErrorResponse(w, "User is not connected. Please connect before creating a ticket.")
 		return
 	}
 
-	callState := &CreateTicketCallState{}
+	callState := &createTicketCallState{}
 	callState.FromState(c.State)
 
 	table := callState.Table
 
-	t, found := config.GetTables()[table]
+	t, found := config.GetTables(c.Context)[table]
 	if !found {
 		utils.WriteCallErrorResponse(w, fmt.Sprintf("Table definition '%s' not found", table))
 		return
@@ -105,20 +105,23 @@ func getCreateTicketForm(fields []*apps.Field, table string, action formAction) 
 	}
 }
 
-func submitTicket(userID, table string, call *apps.CallRequest) (string, error) {
-	c := servicenowclient.NewClient(call.Context.BotAccessToken, call.Context.MattermostSiteURL, call.Context.BotUserID, userID)
+func submitTicket(table string, call *apps.CallRequest) (string, error) {
+	c := servicenowclient.NewClient(call.Context)
 	if c == nil {
 		return "", ErrCannotCreateClient
 	}
 
-	return c.CreateIncident(table, call.Values)
+	return c.CreateIncident(table, call.Values, call.Context)
 }
 
 func getCreateTicketCall(table string, action formAction) *apps.Call {
 	return &apps.Call{
-		Path:   string(constants.BindingPathCreate),
-		Expand: &apps.Expand{Post: apps.ExpandAll},
-		State: CreateTicketCallState{
+		Path: string(constants.BindingPathCreate),
+		Expand: &apps.Expand{
+			Post:       apps.ExpandAll,
+			OAuth2User: apps.ExpandAll,
+		},
+		State: createTicketCallState{
 			Action: action,
 			Table:  table,
 		},

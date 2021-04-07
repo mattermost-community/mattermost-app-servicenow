@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 )
 
-type CreateTicketCallState struct {
+type createTicketCallState struct {
 	Action formAction `json:"action"`
 	Table  string     `json:"table"`
 }
 
-func (s *CreateTicketCallState) FromState(i interface{}) {
+func (s *createTicketCallState) FromState(i interface{}) {
 	if i == nil {
 		return
 	}
@@ -22,11 +22,11 @@ func (s *CreateTicketCallState) FromState(i interface{}) {
 	_ = json.Unmarshal(b, &s)
 }
 
-type ConfigureOAuthCallState struct {
+type configureOAuthCallState struct {
 	Action formAction `json:"action"`
 }
 
-func (s *ConfigureOAuthCallState) FromState(i interface{}) {
+func (s *configureOAuthCallState) FromState(i interface{}) {
 	if i == nil {
 		return
 	}

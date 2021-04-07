@@ -1,6 +1,7 @@
 package mattermost
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
@@ -22,17 +23,23 @@ func fConfigureOAuthSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallR
 		return
 	}
 
-	callState := &ConfigureOAuthCallState{}
+	callState := &configureOAuthCallState{}
 	callState.FromState(c.State)
 
 	action := callState.Action
 
 	if action == formActionSubmit {
-		config.SetServiceNowInstance(c.GetValue(configureOAuthServiceNowInstanceValue, ""))
-		config.SetOAuthConfig(config.OAuthConfig{
-			ClientID:     c.GetValue(configureOAuthClientIDValue, ""),
-			ClientSecret: c.GetValue(configureOAuthClientSecretValue, ""),
-		})
+		config.SetServiceNowInstance(c.GetValue(configureOAuthServiceNowInstanceValue, ""), c.Context)
+
+		err := config.SetOAuthConfig(
+			c.GetValue(configureOAuthClientIDValue, ""),
+			c.GetValue(configureOAuthClientSecretValue, ""),
+			c.Context,
+		)
+		if err != nil {
+			utils.WriteCallErrorResponse(w, fmt.Sprintf("Could not setup the configuration. Error: %v", err.Error()))
+			return
+		}
 
 		utils.WriteCallStandardResponse(w, "Configuration updated")
 
@@ -41,7 +48,7 @@ func fConfigureOAuthSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallR
 
 	utils.WriteCallResponse(w, apps.CallResponse{
 		Type: apps.CallResponseTypeForm,
-		Form: getConfigureOAuthForm(c.Values, formActionSubmit),
+		Form: getConfigureOAuthForm(c.Values, formActionSubmit, c.Context),
 	})
 }
 
@@ -53,13 +60,11 @@ func fConfigureOAuthForm(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 
 	utils.WriteCallResponse(w, apps.CallResponse{
 		Type: apps.CallResponseTypeForm,
-		Form: getConfigureOAuthForm(nil, formActionOpen),
+		Form: getConfigureOAuthForm(nil, formActionOpen, c.Context),
 	})
 }
 
-func getConfigureOAuthForm(v map[string]interface{}, action formAction) *apps.Form {
-	conf := config.OAuth()
-
+func getConfigureOAuthForm(v map[string]interface{}, action formAction, cc *apps.Context) *apps.Form {
 	return &apps.Form{
 		Title: "Configure OAuth",
 		Fields: []*apps.Field{
@@ -68,14 +73,14 @@ func getConfigureOAuthForm(v map[string]interface{}, action formAction) *apps.Fo
 				Label:      configureOAuthServiceNowInstanceValue,
 				ModalLabel: "Service Now Instance",
 				Type:       apps.FieldTypeText,
-				Value:      utils.GetStringFromMapInterface(v, configureOAuthServiceNowInstanceValue, config.ServiceNowInstance()),
+				Value:      utils.GetStringFromMapInterface(v, configureOAuthServiceNowInstanceValue, config.ServiceNowInstance(cc)),
 			},
 			{
 				Name:       configureOAuthClientIDValue,
 				Label:      configureOAuthClientIDValue,
 				ModalLabel: "Client ID",
 				Type:       apps.FieldTypeText,
-				Value:      utils.GetStringFromMapInterface(v, configureOAuthClientIDValue, conf.ClientID),
+				Value:      utils.GetStringFromMapInterface(v, configureOAuthClientIDValue, cc.OAuth2.ClientID),
 			},
 			{
 				Name:        configureOAuthClientSecretValue,
@@ -83,7 +88,7 @@ func getConfigureOAuthForm(v map[string]interface{}, action formAction) *apps.Fo
 				ModalLabel:  "Client Secret",
 				Type:        apps.FieldTypeText,
 				TextSubtype: "password",
-				Value:       utils.GetStringFromMapInterface(v, configureOAuthClientSecretValue, conf.ClientSecret),
+				Value:       utils.GetStringFromMapInterface(v, configureOAuthClientSecretValue, cc.OAuth2.ClientSecret),
 			},
 		},
 		Call: getConfigureOAuthCall(action),
@@ -92,9 +97,13 @@ func getConfigureOAuthForm(v map[string]interface{}, action formAction) *apps.Fo
 
 func getConfigureOAuthCall(action formAction) *apps.Call {
 	return &apps.Call{
-		Path:   string(constants.BindingPathConfigureOAuth),
-		Expand: &apps.Expand{ActingUser: apps.ExpandAll},
-		State: ConfigureOAuthCallState{
+		Path: string(constants.BindingPathConfigureOAuth),
+		Expand: &apps.Expand{
+			ActingUser:            apps.ExpandAll,
+			OAuth2App:             apps.ExpandAll,
+			ActingUserAccessToken: apps.ExpandAll,
+		},
+		State: configureOAuthCallState{
 			Action: action,
 		},
 	}

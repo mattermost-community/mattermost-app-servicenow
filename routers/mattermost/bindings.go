@@ -14,8 +14,8 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	mattermostSiteURL := c.Context.MattermostSiteURL
 	appID := c.Context.AppID
 	baseCommand := &apps.Binding{
-		Label:       "servicenow",
-		Location:    "servicenow",
+		Label:       constants.CommandTrigger,
+		Location:    constants.CommandTrigger,
 		Description: "Create incidents in your ServiceNow instance",
 		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
 	}
@@ -29,7 +29,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 
 	connectionCommand := getConnectBinding(mattermostSiteURL, appID)
 
-	if app.IsUserConnected(c.Context.BotAccessToken, mattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
+	if app.IsUserConnected(c.Context) {
 		connectionCommand = getDisconnectBinding(mattermostSiteURL, appID)
 	}
 
@@ -42,8 +42,8 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 
 	out := []*apps.Binding{}
 
-	if app.IsUserConnected(c.Context.BotAccessToken, mattermostSiteURL, c.Context.ActingUserID, c.Context.BotUserID) {
-		postBindings, commandBindings, headerBindings := app.GetTablesBindings(mattermostSiteURL, appID)
+	if app.IsUserConnected(c.Context) {
+		postBindings, commandBindings, headerBindings := app.GetTablesBindings(c.Context)
 		if postBindings != nil {
 			out = append(out, &apps.Binding{
 				Location: apps.LocationPostMenu,

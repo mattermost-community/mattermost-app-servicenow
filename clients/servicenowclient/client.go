@@ -11,7 +11,8 @@ import (
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/config"
-	"github.com/mattermost/mattermost-app-servicenow/store"
+
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
 type Client struct {
@@ -20,12 +21,12 @@ type Client struct {
 
 var ErrUnexpectedStatus = errors.New("returned with unexpected status")
 
-func NewClient(botAccessToken, baseURL, botID, userID string) *Client {
+func NewClient(cc *apps.Context) *Client {
 	ctx := context.Background()
-	oAuthConf := app.GetOAuthConfig()
+	oAuthConf := app.GetOAuthConfig(cc)
 
-	token, found := store.GetToken(botAccessToken, baseURL, botID, userID)
-	if !found {
+	token := app.GetTokenFromContext(cc)
+	if token == nil {
 		return nil
 	}
 
@@ -34,8 +35,8 @@ func NewClient(botAccessToken, baseURL, botID, userID string) *Client {
 	}
 }
 
-func (c *Client) CreateIncident(table string, v interface{}) (string, error) {
-	url := fmt.Sprintf("%s%s/%s", config.ServiceNowInstance(), "/api/now/table", table)
+func (c *Client) CreateIncident(table string, v interface{}, cc *apps.Context) (string, error) {
+	url := fmt.Sprintf("%s%s/%s", config.ServiceNowInstance(cc), "/api/now/table", table)
 
 	b, err := json.Marshal(v)
 	if err != nil {

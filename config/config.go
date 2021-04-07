@@ -5,17 +5,13 @@ import (
 	"log"
 
 	"github.com/mattermost/mattermost-app-servicenow/store"
+
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
 type config struct {
 	ServiceNowInstance string
-	OAuth              OAuthConfig
 	Tables             TablesConfig
-}
-
-type OAuthConfig struct {
-	ClientID     string
-	ClientSecret string
 }
 
 type LocalConfig struct {
@@ -25,62 +21,34 @@ type LocalConfig struct {
 	BotID          string
 }
 
-func ServiceNowInstance() string {
-	c := load()
+func ServiceNowInstance(cc *apps.Context) string {
+	c := load(cc)
 	return c.ServiceNowInstance
 }
 
-func OAuth() OAuthConfig {
-	c := load()
-	return c.OAuth
-}
-
-func Local() LocalConfig {
-	return loadLocal()
-}
-
-func SetBaseURL(s string) {
-	c := loadLocal()
-	c.BaseURL = s
-	saveLocal(c)
-}
-
-func SetServiceNowInstance(s string) {
-	c := load()
+func SetServiceNowInstance(s string, cc *apps.Context) {
+	c := load(cc)
 	c.ServiceNowInstance = s
-	save(c)
+	save(c, cc)
 }
 
-func SetOAuthConfig(v OAuthConfig) {
-	c := load()
-	c.OAuth = v
-	save(c)
-}
-
-func SetLocalConfig(v LocalConfig) {
-	saveLocal(v)
-}
-
-func save(c config) {
-	lc := loadLocal()
-
+func save(c config, cc *apps.Context) {
 	dat, err := json.Marshal(c)
 	if err != nil {
 		log.Printf("Could not marshal config: %v", err)
 		return
 	}
 
-	err = store.SaveConfig(dat, lc.BotAccessToken, lc.MattermostURL, lc.BotID)
+	err = store.SaveConfig(dat, cc)
 	if err != nil {
 		log.Printf("Could not store config: %v", err)
 	}
 }
 
-func load() config {
+func load(cc *apps.Context) config {
 	defaultConfig := config{}
-	lc := loadLocal()
 
-	dat, err := store.LoadConfig(lc.BotAccessToken, lc.MattermostURL, lc.BotID)
+	dat, err := store.LoadConfig(cc)
 	if err != nil {
 		log.Printf("Could not load config: %v", err)
 		return defaultConfig
@@ -95,39 +63,4 @@ func load() config {
 	}
 
 	return c
-}
-
-func loadLocal() LocalConfig {
-	defaultLocalConfig := LocalConfig{
-		BaseURL: "http://localhost:3000",
-	}
-
-	dat, err := store.LoadLocalConfig()
-	if err != nil {
-		log.Printf("Could not load local config: %v", err)
-		return defaultLocalConfig
-	}
-
-	c := LocalConfig{}
-
-	err = json.Unmarshal(dat, &c)
-	if err != nil {
-		log.Printf("Could not unmarshall local config: %v", err)
-		return defaultLocalConfig
-	}
-
-	return c
-}
-
-func saveLocal(c LocalConfig) {
-	dat, err := json.Marshal(c)
-	if err != nil {
-		log.Printf("Could not marshal local config: %v", err)
-		return
-	}
-
-	err = store.SaveLocalConfig(dat)
-	if err != nil {
-		log.Printf("Could not store local config: %v", err)
-	}
 }

@@ -16,24 +16,24 @@ type TableConfig struct {
 	PostDefault string
 }
 
-func AddTable(conf TableConfig) {
-	c := load()
+func AddTable(conf TableConfig, cc *apps.Context) {
+	c := load(cc)
 	if c.Tables == nil {
 		c.Tables = TablesConfig{}
 	}
 
 	c.Tables[conf.ID] = conf
-	save(c)
+	save(c, cc)
 }
 
-func RemoveTable(id string) {
-	c := load()
+func RemoveTable(id string, cc *apps.Context) {
+	c := load(cc)
 	delete(c.Tables, id)
-	save(c)
+	save(c, cc)
 }
 
-func GetTables() TablesConfig {
-	c := load()
+func GetTables(cc *apps.Context) TablesConfig {
+	c := load(cc)
 
 	// Remove when Add and Remove table functionality is present. Adds default table.
 	if c.Tables == nil {

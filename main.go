@@ -12,9 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 
-	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/routers/mattermost"
-	"github.com/mattermost/mattermost-app-servicenow/routers/oauth"
 )
 
 const (
@@ -41,21 +39,18 @@ func main() {
 	// Init routers
 	r := mux.NewRouter()
 	mattermost.Init(r, &manifest, staticAssets, localMode)
-	oauth.Init(r)
 
 	http.Handle("/", r)
 
 	if localMode {
-		if len(os.Args) > baseURLPosition {
-			config.SetBaseURL(os.Args[baseURLPosition])
-		}
+		baseURL := os.Args[baseURLPosition]
 
 		addr := ":3000"
 		if len(os.Args) > addressPosition {
 			addr = os.Args[addressPosition]
 		}
 
-		manifest.HTTPRootURL = config.Local().BaseURL
+		manifest.HTTPRootURL = baseURL
 		manifest.AppType = apps.AppTypeHTTP
 
 		_ = http.ListenAndServe(addr, nil)

@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"log"
 	"strings"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
@@ -26,4 +28,9 @@ func GetStringFromMapInterface(in map[string]interface{}, key, def string) strin
 
 func GetIconURL(siteURL, name string, appID apps.AppID) string {
 	return strings.TrimRight(siteURL, "/") + "/plugins/com.mattermost.apps/api/v1/static/" + string(appID) + "/" + name
+}
+
+func DumpObject(c interface{}) {
+	b, _ := json.MarshalIndent(c, "", "    ")
+	log.Printf("%s\n", string(b))
 }

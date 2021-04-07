@@ -1,15 +1,13 @@
 package store
 
 import (
-	"io/ioutil"
-
-	"github.com/mattermost/mattermost-app-servicenow/clients/mattermostclient"
-	"github.com/mattermost/mattermost-app-servicenow/constants"
+	"github.com/mattermost/mattermost-plugin-apps/apps"
+	"github.com/mattermost/mattermost-plugin-apps/apps/mmclient"
 )
 
-func SaveConfig(conf []byte, botAccessToken, baseURL, botID string) error {
-	c := mattermostclient.NewKVClient(botAccessToken, baseURL, botID)
-	err := c.KVSet("config", map[string]interface{}{"config": conf})
+func SaveConfig(conf []byte, cc *apps.Context) error {
+	c := mmclient.AsBot(cc)
+	_, err := c.KVSet("config", "", map[string]interface{}{"config": conf})
 
 	if err != nil {
 		return err
@@ -18,11 +16,11 @@ func SaveConfig(conf []byte, botAccessToken, baseURL, botID string) error {
 	return nil
 }
 
-func LoadConfig(botAccessToken, baseURL, botID string) ([]byte, error) {
-	c := mattermostclient.NewKVClient(botAccessToken, baseURL, botID)
+func LoadConfig(cc *apps.Context) ([]byte, error) {
+	c := mmclient.AsBot(cc)
 	stored := map[string][]byte{}
 
-	err := c.KVGet("config", &stored)
+	err := c.KVGet("config", "", &stored)
 	if err != nil {
 		return nil, err
 	}
@@ -32,22 +30,4 @@ func LoadConfig(botAccessToken, baseURL, botID string) ([]byte, error) {
 	}
 
 	return nil, nil
-}
-
-func SaveLocalConfig(conf []byte) error {
-	err := ioutil.WriteFile(constants.ConfigFile, conf, 0600)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func LoadLocalConfig() ([]byte, error) {
-	dat, err := ioutil.ReadFile(constants.ConfigFile)
-	if err != nil {
-		return nil, err
-	}
-
-	return dat, nil
 }
