@@ -9,30 +9,27 @@ import (
 )
 
 func GetTablesBindings(cc *apps.Context) (post, command, header *apps.Binding) {
-	siteURL := cc.MattermostSiteURL
-	appID := cc.AppID
-
 	pt, ct, ht := filterTables(config.GetTables(cc))
-	pb := baseBinding(siteURL, "Create Ticket", appID)
-	cb := baseBinding(siteURL, "create-ticket", appID)
-	hb := baseBinding(siteURL, "Create Ticket", appID)
-	post = subBindings(siteURL, pt, pb, false, appID)
-	command = subBindings(siteURL, ct, cb, true, appID)
-	header = subBindings(siteURL, ht, hb, false, appID)
+	pb := baseBinding("Create Ticket", cc)
+	cb := baseBinding("create-ticket", cc)
+	hb := baseBinding("Create Ticket", cc)
+	post = subBindings(pt, pb, false, cc)
+	command = subBindings(ct, cb, true, cc)
+	header = subBindings(ht, hb, false, cc)
 
 	return
 }
 
-func baseBinding(siteURL, label string, appID apps.AppID) *apps.Binding {
+func baseBinding(label string, cc *apps.Context) *apps.Binding {
 	return &apps.Binding{
 		Location: constants.LocationCreate,
 		Label:    label,
-		Icon:     utils.GetIconURL(siteURL, "now-mobile-icon.png", appID),
+		Icon:     utils.GetIconURL("now-mobile-icon.png", cc),
 		Bindings: []*apps.Binding{},
 	}
 }
 
-func subBindings(siteURL string, tt config.TablesConfig, base *apps.Binding, useLocationLabel bool, appID apps.AppID) *apps.Binding {
+func subBindings(tt config.TablesConfig, base *apps.Binding, useLocationLabel bool, cc *apps.Context) *apps.Binding {
 	switch len(tt) {
 	case 0:
 		return nil
@@ -55,7 +52,7 @@ func subBindings(siteURL string, tt config.TablesConfig, base *apps.Binding, use
 		base.Bindings = append(base.Bindings, &apps.Binding{
 			Location: apps.Location(t.ID),
 			Label:    label,
-			Icon:     utils.GetIconURL(siteURL, "now-mobile-icon.png", appID),
+			Icon:     utils.GetIconURL("now-mobile-icon.png", cc),
 			Call: &apps.Call{
 				Path: t.ID,
 			},

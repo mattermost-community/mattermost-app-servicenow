@@ -11,13 +11,11 @@ import (
 )
 
 func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
-	mattermostSiteURL := c.Context.MattermostSiteURL
-	appID := c.Context.AppID
 	baseCommand := &apps.Binding{
 		Label:       constants.CommandTrigger,
 		Location:    constants.CommandTrigger,
 		Description: "Create incidents in your ServiceNow instance",
-		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
+		Icon:        utils.GetIconURL("now-mobile-icon.png", c.Context),
 	}
 
 	commands := &apps.Binding{
@@ -27,17 +25,17 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 		},
 	}
 
-	connectionCommand := getConnectBinding(mattermostSiteURL, appID)
+	connectionCommand := getConnectBinding(c.Context)
 
 	if app.IsUserConnected(c.Context) {
-		connectionCommand = getDisconnectBinding(mattermostSiteURL, appID)
+		connectionCommand = getDisconnectBinding(c.Context)
 	}
 
 	baseCommand.Bindings = append(baseCommand.Bindings, connectionCommand)
 
 	user := c.Context.ActingUser
 	if user != nil && user.IsSystemAdmin() {
-		baseCommand.Bindings = append(baseCommand.Bindings, getSysAdminCommandBindings(mattermostSiteURL, appID))
+		baseCommand.Bindings = append(baseCommand.Bindings, getSysAdminCommandBindings(c.Context))
 	}
 
 	out := []*apps.Binding{}
@@ -80,18 +78,18 @@ func generateTableBindingsCalls(b *apps.Binding) *apps.Binding {
 	return b
 }
 
-func getSysAdminCommandBindings(mattermostSiteURL string, appID apps.AppID) *apps.Binding {
+func getSysAdminCommandBindings(cc *apps.Context) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationConfigure,
 		Label:       "config",
-		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
+		Icon:        utils.GetIconURL("now-mobile-icon.png", cc),
 		Hint:        "",
 		Description: "Configure the plugin",
 		Bindings: []*apps.Binding{
 			{
 				Location:    constants.LocationConfigureOAuth,
 				Label:       "oauth",
-				Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
+				Icon:        utils.GetIconURL("now-mobile-icon.png", cc),
 				Hint:        "",
 				Description: "Configure OAuth options",
 				Call:        getConfigureOAuthCall(formActionOpen),
@@ -99,11 +97,11 @@ func getSysAdminCommandBindings(mattermostSiteURL string, appID apps.AppID) *app
 		},
 	}
 }
-func getConnectBinding(mattermostSiteURL string, appID apps.AppID) *apps.Binding {
+func getConnectBinding(cc *apps.Context) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationConnect,
 		Label:       "connect",
-		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
+		Icon:        utils.GetIconURL("now-mobile-icon.png", cc),
 		Hint:        "",
 		Description: "Connect your ServiceNow account",
 		Form:        &apps.Form{},
@@ -111,11 +109,11 @@ func getConnectBinding(mattermostSiteURL string, appID apps.AppID) *apps.Binding
 	}
 }
 
-func getDisconnectBinding(mattermostSiteURL string, appID apps.AppID) *apps.Binding {
+func getDisconnectBinding(cc *apps.Context) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationDisconnect,
 		Label:       "disconnect",
-		Icon:        utils.GetIconURL(mattermostSiteURL, "now-mobile-icon.png", appID),
+		Icon:        utils.GetIconURL("now-mobile-icon.png", cc),
 		Hint:        "",
 		Description: "Disconnect from ServiceNow",
 		Form:        &apps.Form{},
