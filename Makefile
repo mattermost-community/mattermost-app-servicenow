@@ -37,7 +37,7 @@ lint:
 .PHONY: dist
 ## dist: creates the bundle file
 dist: build
-	cp -r static/ dist; cp manifest.json dist/; cd dist/; zip -qr go-function mattermost-app-servicenow; zip -r bundle.zip go-function.zip manifest.json static/
+	cp -r static dist; cp manifest.json dist/; cd dist/; zip -qr go-function mattermost-app-servicenow; zip -r bundle.zip go-function.zip manifest.json static/
 
 .PHONY: clean
 ## clean: deletes all
