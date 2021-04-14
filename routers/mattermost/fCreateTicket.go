@@ -44,7 +44,7 @@ func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 
 		navToURI := fmt.Sprintf("/%s?sys_id=%s", table, url.QueryEscape(id))
 		ticketLink := fmt.Sprintf("%s/nav_to.do?uri=%s", config.ServiceNowInstance(), url.QueryEscape(navToURI))
-		utils.WriteCallStandardResponse(w, fmt.Sprintf("Ticket created with [sys_id %s](%s).", id, ticketLink))
+		utils.WriteCallStandardResponse(w, fmt.Sprintf("Ticket created [here](%s).", ticketLink)))
 
 		return
 	}
