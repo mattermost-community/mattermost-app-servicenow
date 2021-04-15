@@ -8,15 +8,19 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	"golang.org/x/oauth2"
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/config"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
+	"github.com/mattermost/mattermost-plugin-apps/apps/mmclient"
 )
 
 type Client struct {
-	client *http.Client
+	client      *http.Client
+	tokenSource oauth2.TokenSource
+	original    oauth2.Token
 }
 
 var ErrUnexpectedStatus = errors.New("returned with unexpected status")
@@ -30,8 +34,12 @@ func NewClient(cc *apps.Context) *Client {
 		return nil
 	}
 
+	tokSrc := oAuthConf.TokenSource(ctx, token)
+
 	return &Client{
-		client: oAuthConf.Client(ctx, token),
+		client:      oauth2.NewClient(ctx, tokSrc),
+		tokenSource: tokSrc,
+		original:    *token,
 	}
 }
 
@@ -48,6 +56,11 @@ func (c *Client) CreateIncident(table string, v interface{}, cc *apps.Context) (
 		return "", err
 	}
 	defer resp.Body.Close()
+
+	tok, _ := c.tokenSource.Token()
+	if tok.AccessToken != c.original.AccessToken {
+		_ = mmclient.AsActingUser(cc).StoreOAuth2User(cc.AppID, tok)
+	}
 
 	if resp.StatusCode != http.StatusCreated {
 		return "", fmt.Errorf("%w: %v", ErrUnexpectedStatus, resp.Status)

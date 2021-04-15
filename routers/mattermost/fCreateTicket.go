@@ -119,6 +119,7 @@ func getCreateTicketCall(table string, action formAction) *apps.Call {
 		Path: string(constants.BindingPathCreate),
 		Expand: &apps.Expand{
 			Post:       apps.ExpandAll,
+			OAuth2App:  apps.ExpandAll,
 			OAuth2User: apps.ExpandAll,
 		},
 		State: createTicketCallState{
