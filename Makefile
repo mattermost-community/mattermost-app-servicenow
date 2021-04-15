@@ -11,6 +11,11 @@ all: run
 .PHONY: build
 ## build: build the executable
 build:
+	GOOS=linux $(GO) build -o dist/mattermost-app-servicenow
+
+.PHONY: build-local
+## build: build the executable
+build-local:
 	$(GO) build -o dist/mattermost-app-servicenow
 
 .PHONY: run
