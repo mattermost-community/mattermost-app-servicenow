@@ -43,7 +43,7 @@ Any check on whether the user is connected or not will be made checking whether 
 
 For connected users, they will no longer see the connect command. They will have a disconnect command, and bindings on post, channel header and command for creating tickets.
 
-When a user disconnects, the call just set the oauth user information to nil.
+When a user disconnects, the call just set the oauth user information to `nil`.
 
 All “create ticket” bindings will open a modal dialog. Channel header binding will open an empty modal, post menu binding will open a modal with “short description” set to the post content, and command binding will pre-populate all fields with the values we set on the command.
 
