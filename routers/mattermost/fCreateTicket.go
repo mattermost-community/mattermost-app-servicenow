@@ -32,6 +32,7 @@ func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 	t, found := config.GetTables(c.Context)[table]
 	if !found {
 		utils.WriteCallErrorResponse(w, fmt.Sprintf("Table definition '%s' not found", table))
+		return
 	}
 
 	// Modal submits the information

@@ -23,6 +23,7 @@ func fDisconnect(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	err := client.StoreOAuth2User(c.Context.AppID, nil)
 	if err != nil {
 		utils.WriteCallErrorResponse(w, fmt.Sprintf("Cannot disconnect. Error: %v", err))
+		return
 	}
 
 	utils.WriteCallStandardResponse(w, "You are disconnected from Service Now.")
