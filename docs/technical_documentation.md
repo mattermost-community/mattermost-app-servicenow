@@ -28,7 +28,7 @@ The OAuth configuration will be stored in two different places. The client ID an
 
 The connect command will just generate a ephemeral message with the link to start the OAuth process through Mattermost.
 
-The connect call wil:
+The connect call will:
 - Create the oauth configuration using the information in the context
 - Fetch the state from the call values and fail in case it does not exist.
 - Return the AuthCodeURL to Mattermost
