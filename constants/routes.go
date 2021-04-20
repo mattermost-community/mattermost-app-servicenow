@@ -37,5 +37,6 @@ const (
 	OAuthStateTTL      = 5 * time.Minute
 	OAuthStateGCTicker = 30 * time.Second
 
-	MattermostURL = "http://localhost:8065"
+	MattermostURL           = "http://localhost:8065"
+	RefreshBindingsAppsPath = "/api/v1/refresh_bindings"
 )

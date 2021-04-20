@@ -1,9 +1,12 @@
 package mattermost
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
+	"github.com/pkg/errors"
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
@@ -119,4 +122,31 @@ func getDisconnectBinding(cc *apps.Context) *apps.Binding {
 		Form:        &apps.Form{},
 		Call:        getDisconnectCall(),
 	}
+}
+
+func refreshBindings(siteURL, userID string) error {
+	pluginURL := utils.GetAppsPluginURL(siteURL)
+	u := fmt.Sprintf("%s%s", pluginURL, constants.RefreshBindingsAppsPath)
+
+	r, err := http.NewRequest(http.MethodPost, u, nil)
+	if err != nil {
+		return errors.Wrap(err, "failed to create request")
+	}
+	r.URL.Query().Add("user_id", userID)
+
+	resp, err := http.DefaultClient.Do(r)
+	if err != nil {
+		return errors.Wrap(err, "failed to send http request")
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		return errors.Errorf("received error with status %v: %s", resp.StatusCode, string(b))
+	}
+
+	return nil
 }

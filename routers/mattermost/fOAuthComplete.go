@@ -39,5 +39,11 @@ func fOAuthComplete(w http.ResponseWriter, r *http.Request, c *apps.CallRequest)
 		return
 	}
 
+	err = refreshBindings(c.Context.MattermostSiteURL, c.Context.ActingUserID)
+	if err != nil {
+		errMsg := fmt.Sprintf("Error refreshing bindings: %v", err)
+		log.Printf(errMsg, err)
+	}
+
 	utils.WriteCallStandardResponse(w, "You are now connected to ServiceNow")
 }

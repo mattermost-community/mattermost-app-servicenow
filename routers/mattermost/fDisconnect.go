@@ -2,6 +2,7 @@ package mattermost
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
@@ -24,6 +25,12 @@ func fDisconnect(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	if err != nil {
 		utils.WriteCallErrorResponse(w, fmt.Sprintf("Cannot disconnect. Error: %v", err))
 		return
+	}
+
+	err = refreshBindings(c.Context.MattermostSiteURL, c.Context.ActingUserID)
+	if err != nil {
+		errMsg := fmt.Sprintf("Error refreshing bindings: %v", err)
+		log.Printf(errMsg, err)
 	}
 
 	utils.WriteCallStandardResponse(w, "You are disconnected from Service Now.")
