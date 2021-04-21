@@ -21,6 +21,9 @@ const (
 	BindingPathDisconnect     utils.Path = "/disconnect"
 	BindingPathConfigureOAuth utils.Path = "/configure/oauth"
 
+	AppsPluginAPIPath             = "/api/v1"
+	AppsPluginRefreshBindingsPath = AppsPluginAPIPath + "/refresh_bindings"
+
 	LocationCreate         = "create"
 	LocationConnect        = "connect"
 	LocationDisconnect     = "disconnect"
@@ -37,6 +40,5 @@ const (
 	OAuthStateTTL      = 5 * time.Minute
 	OAuthStateGCTicker = 30 * time.Second
 
-	MattermostURL           = "http://localhost:8065"
-	RefreshBindingsAppsPath = "/api/v1/refresh_bindings"
+	MattermostURL = "http://localhost:8065"
 )

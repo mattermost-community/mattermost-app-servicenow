@@ -126,7 +126,7 @@ func getDisconnectBinding(cc *apps.Context) *apps.Binding {
 
 func refreshBindings(siteURL, userID string) error {
 	pluginURL := utils.GetAppsPluginURL(siteURL)
-	u := fmt.Sprintf("%s%s", pluginURL, constants.RefreshBindingsAppsPath)
+	u := fmt.Sprintf("%s%s", pluginURL, constants.AppsPluginRefreshBindingsPath)
 
 	r, err := http.NewRequest(http.MethodPost, u, nil)
 	if err != nil {
