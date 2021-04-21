@@ -132,6 +132,7 @@ func refreshBindings(siteURL, userID string) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to create request")
 	}
+
 	r.URL.Query().Add("user_id", userID)
 
 	resp, err := http.DefaultClient.Do(r)
@@ -141,6 +142,8 @@ func refreshBindings(siteURL, userID string) error {
 
 	if resp.StatusCode != http.StatusOK {
 		b, err := ioutil.ReadAll(resp.Body)
+		defer resp.Body.Close()
+
 		if err != nil {
 			return err
 		}
