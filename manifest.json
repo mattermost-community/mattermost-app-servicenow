@@ -7,7 +7,10 @@
     "homepage_url": "https://github.com/mattermost/mattermost-app-servicenow",
     "root_url": "",
     "requested_permissions": [
-        "act_as_bot"
+        "act_as_bot",
+        "remote_oauth2",
+        "act_as_user",
+        "act_as_admin"
     ],
     "requested_locations": [
         "/command",
@@ -22,10 +25,24 @@
             "runtime": "go1.x"
         }
     ],
+    "get_oauth2_connect_url": {
+        "path": "/oauth2/connect",
+        "expand": {
+            "oauth2_app": "all"
+        }
+    },
+    "on_oauth2_complete": {
+        "path": "/oauth2/complete",
+        "expand": {
+            "oauth2_app": "all",
+            "acting_user_access_token": "all"
+        }
+    },
     "bindings": {
         "path": "/bindings",
         "expand": {
-            "acting_user": "all"
+            "acting_user": "all",
+            "oauth2_user": "all"
         }
     },
     "assets": []

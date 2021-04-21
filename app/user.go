@@ -1,10 +1,10 @@
 package app
 
 import (
-	"github.com/mattermost/mattermost-app-servicenow/store"
+	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
-func IsUserConnected(botAccessToken, baseURL, userID, botID string) bool {
-	_, found := store.GetToken(botAccessToken, baseURL, botID, userID)
-	return found
+func IsUserConnected(cc *apps.Context) bool {
+	token := GetTokenFromContext(cc)
+	return token != nil
 }

@@ -7,35 +7,43 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/mattermost/mattermost-plugin-apps/apps"
+	"github.com/mattermost/mattermost-plugin-apps/apps/mmclient"
 	"github.com/pkg/errors"
+	"golang.org/x/oauth2"
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/config"
-	"github.com/mattermost/mattermost-app-servicenow/store"
 )
 
 type Client struct {
-	client *http.Client
+	client      *http.Client
+	tokenSource oauth2.TokenSource
+	original    oauth2.Token
 }
 
 var ErrUnexpectedStatus = errors.New("returned with unexpected status")
 
-func NewClient(botAccessToken, baseURL, botID, userID string) *Client {
+func NewClient(cc *apps.Context) *Client {
 	ctx := context.Background()
-	oAuthConf := app.GetOAuthConfig()
+	oAuthConf := app.GetOAuthConfig(cc)
 
-	token, found := store.GetToken(botAccessToken, baseURL, botID, userID)
-	if !found {
+	token := app.GetTokenFromContext(cc)
+	if token == nil {
 		return nil
 	}
 
+	tokSrc := oAuthConf.TokenSource(ctx, token)
+
 	return &Client{
-		client: oAuthConf.Client(ctx, token),
+		client:      oauth2.NewClient(ctx, tokSrc),
+		tokenSource: tokSrc,
+		original:    *token,
 	}
 }
 
-func (c *Client) CreateIncident(table string, v interface{}) (string, error) {
-	url := fmt.Sprintf("%s%s/%s", config.ServiceNowInstance(), "/api/now/table", table)
+func (c *Client) CreateIncident(table string, v interface{}, cc *apps.Context) (string, error) {
+	url := fmt.Sprintf("%s%s/%s", config.ServiceNowInstance(cc), "/api/now/table", table)
 
 	b, err := json.Marshal(v)
 	if err != nil {
@@ -47,6 +55,11 @@ func (c *Client) CreateIncident(table string, v interface{}) (string, error) {
 		return "", err
 	}
 	defer resp.Body.Close()
+
+	tok, _ := c.tokenSource.Token()
+	if tok.AccessToken != c.original.AccessToken {
+		_ = mmclient.AsActingUser(cc).StoreOAuth2User(cc.AppID, tok)
+	}
 
 	if resp.StatusCode != http.StatusCreated {
 		return "", fmt.Errorf("%w: %v", ErrUnexpectedStatus, resp.Status)

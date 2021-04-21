@@ -12,7 +12,7 @@ const (
 	BindingsPath    = "/bindings"
 	StaticAssetPath = "/static"
 
-	OAuthPath         = "/oauth"
+	OAuthPath         = "/oauth2"
 	OAuthConnectPath  = "/connect"
 	OAuthCompletePath = "/complete"
 
@@ -30,7 +30,7 @@ const (
 	ConfigFile = "config.json"
 	TokenFile  = "tokens.json"
 
-	CommandTrigger = "com.mattermost.servicenow"
+	CommandTrigger = "servicenow"
 
 	AppSecret = "1234"
 
