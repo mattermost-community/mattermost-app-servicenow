@@ -8,6 +8,11 @@ GO_TEST_FLAGS ?= -race
 ## all: builds and runs the service
 all: run
 
+.PHONY: build-linux
+## build-linux: build the executable for linux
+build-linux:
+	GOOS=linux GOARCH=amd64 $(GO) build -o dist/mattermost-app-servicenow
+
 .PHONY: build
 ## build: build the executable
 build:
@@ -16,7 +21,7 @@ build:
 .PHONY: run
 ## run: runs the service
 run: build
-	LOCAL=true ./dist/mattermost-app-servicenow ${BASE} ${ADDR}
+	LOCAL=true ./dist/mattermost-app-servicenow ${BASE} ${ADDR} -v
 
 .PHONY: test
 ## test: tests all packages
@@ -36,8 +41,8 @@ lint:
 
 .PHONY: dist
 ## dist: creates the bundle file
-dist: build
-	cp -r static/ dist; cp manifest.json dist/; cd dist/; zip -qr go-function mattermost-app-servicenow; zip -r bundle.zip go-function.zip manifest.json static/
+dist: build-linux
+	cp -r static dist; cp manifest.json dist/; cd dist/; zip -qr go-function mattermost-app-servicenow; zip -r bundle.zip go-function.zip manifest.json static/
 
 .PHONY: clean
 ## clean: deletes all
