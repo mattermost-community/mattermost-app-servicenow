@@ -2,3 +2,4 @@ vendor
 config.json
 tokens.json
 /dist/
+/.DS_Store
