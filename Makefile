@@ -30,7 +30,7 @@ test:
 
 .PHONY: lint
 ## lint: Run golangci-lint on codebase
-lint: 
+lint:
 	@if ! [ -x "$$(command -v golangci-lint)" ]; then \
 		echo "golangci-lint is not installed. Please see https://github.com/golangci/golangci-lint#install for installation instructions."; \
 		exit 1; \
