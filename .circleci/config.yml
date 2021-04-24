@@ -59,7 +59,7 @@ jobs:
           paths:
             - "bundle.zip"
       - store_artifacts:
-          path: dist
+          path: dist/bundle.zip
 
 workflows:
   version: 2
@@ -77,15 +77,6 @@ workflows:
       - build
   ci:
     jobs:
-      - lint:
-          filters:
-            tags:
-              only: /^v.*/
-      - test:
-          filters:
-            tags:
-              only: /^v.*/
-      - build:
-          filters:
-            tags:
-              only: /^v.*/
+      - lint
+      - test
+      - build
