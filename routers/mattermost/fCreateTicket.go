@@ -85,20 +85,11 @@ func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallReque
 	callState.FromState(c.State)
 
 	table := callState.Table
-	action := callState.Action
 
 	t, found := config.GetTables(c.Context)[table]
 	if !found {
 		utils.WriteCallErrorResponse(w, fmt.Sprintf("Table definition '%s' not found", table))
 		return
-	}
-
-	if action == formActionOpen {
-		for _, field := range t.Fields {
-			if field.Name == config.FieldShortDescription {
-				field.IsRequired = false
-			}
-		}
 	}
 
 	utils.WriteCallResponse(w, apps.CallResponse{
