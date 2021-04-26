@@ -6,6 +6,6 @@ stages:
   - publish
 
 include:
-  - project: mattermost/ci/mattermost-app-servicenow
+  - project: mattermost/ci/mattermost-apps
     ref: main
     file: private.yml
