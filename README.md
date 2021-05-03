@@ -1,31 +1,59 @@
-# Service Now app for Mattermost
+# Service Now App
 
-## Install
+A ServiceNow app for Mattermost.
+
+This repository is licensed under the [Apache 2.0 License](https://github.com/mattermost/mattermost-plugin-github/blob/master/LICENSE).
+
+## Table of Contents
+
+ - [Admin Guide](#admin-guide)
+    - [Setting up](#setting-up)    
+ - [User's Guide](#users-guide)
+    - [Usage](#usage)    
+ - [Development](#development)
+
+## Admin Guide
+
+This guide is intended for Mattermost System Admins setting up the ServiceNow app. For more information about contributing to this plugin, visit the [Development section](#development). For more information about the ServiceNow app, read the [technical guide](../docs/technical_documentation).
+
+### Setting up
+
+1. OAuth must be configured to use ServiceNow. In order to configure ServiceNow, refer to the [ServiceNow documentation](https://docs.servicenow.com/bundle/paris-platform-administration/page/administer/security/task/t_CreateEndpointforExternalClients.html).
+2. For a redirect URL use `MATTERMOSTURL/plugins/com.mattermost.apps/apps/com.mattermost.servicenow/oauth2/remote/complete`.
+3. In Mattermost, run the command `/servicenow configure oauth` and introduce the required fields.
+  - `Instance URL` is the URL for your ServiceNow instance.
+  - `Client ID` is the client ID generated in step 1.
+  - `Client Secret` is the client secret generated in step 1.
+
+## User's Guide
+
+This guide is intended for Mattermost users who want information about the app's functionality, and Mattermost users who want to connect their ServiceNow account to Mattermost. Connect your ServiceNow account to Mattermost using: `/com.mattermost.servicenow connect` and follow the instructions provided.
+
+To disconnect your account, run `/com.mattermost.servicenow disconnect`.
+
+### Usage
+
+1. In this version, only elements in the `incident` table on ServiceNow can be created.
+2. Tickets can be created either by the post menu item, channel header icon, or slash command.
+  - Tickets created from the post menu will populate the short description with the post content.
+  - Tickets created by commands will show a confirmation modal before creating the ticket.
+
+## Development
+
+### Local development install
 
 1. Running `make` will build the executable and start the server.
   - A base URL can be added so links are sent based on that url (e.g. `make BASE=http://myurl.com`). Defaults to `http://localhost:3000`.
-  - An address can be added for the "ListenAndServe" function (e.g. `make ADDR=:3000`). Defaults to `:3000`.
-3. Run the following command in Mattermost `/apps install --url http://localhost:3000/manifest`.
-  - If a base URL has been set on step 2, run the install command with that URL. (e.g. `/app install --url http://myurl.com/manifest`)
-4. As secret key, use `1234`.
+  - An address can be added for the `ListenAndServe` function (e.g. `make ADDR=:3000`). Defaults to `:3000`.
+2. Set up your instance to use the apps framework debug commands:
+  - Go to **System Console > Environment > Developer**.
+  - Set **Enable Testing Commands** to **true**.
+  - Set **Enable Developer Mode** to **true**.
+  - Select **Save**.
+3. Add the manifest to your instance using the following command: `/apps debug-add-manifest --url BASE/manifest`.
+4. Run the following slash command in Mattermost: `/apps install --app-id com.mattermost.servicenow`.
+5. Use `1234` as the secret key.
 
-## Provision
+### Provision
 
-To provision this PR to AWS run `make dist` to generate the App bundle and then follow the steps [here](https://github.com/mattermost/mattermost-plugin-apps#provisioning).
-
-## Configuration
-
-1. OAuth must be configured to use ServiceNow. In order to configure ServiceNow side, refer to [ServiceNow documentation](https://docs.servicenow.com/bundle/paris-platform-administration/page/administer/security/task/t_CreateEndpointforExternalClients.html).
-2. For redirect URL please use `BASE/oauth/complete`.
-3. In Mattermost, run the command `/com.mattermost.servicenow configure oauth` and introduce the required fields.
-
-## Connection
-1. In Mattermost, run the command `/com.mattermost.servicenow connect` and follow the instructions.
-2. To disconnect the account, run `/com.mattermost.servicenow disconnect`.
-
-## Usage
-1. In this version, only elements in the `incident` table on servicenow can be created.
-2. Tickets can be created either by the post menu item, channel header icon, or slash command.
-  - Tickets created from post menu will populate the short description with the post content.
-  - Tickets created by commands will show a confirmation modal before creating the ticket.
-
+To provision this PR to AWS run `make dist` to generate the app bundle and then follow the steps [here](https://github.com/mattermost/mattermost-plugin-apps#provisioning).
