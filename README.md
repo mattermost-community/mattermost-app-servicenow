@@ -45,7 +45,10 @@ To disconnect the account, run `/com.mattermost.servicenow disconnect`.
 1. Running `make` will build the executable and start the server.
   - A base URL can be added so links are sent based on that url (e.g. `make BASE=http://myurl.com`). Defaults to `http://localhost:3000`.
   - An address can be added for the "ListenAndServe" function (e.g. `make ADDR=:3000`). Defaults to `:3000`.
-2. Set up your instance to use the Apps Framework debug commands.
+2. Go to **System Console > Environment > Developer**.
+3. Set **Enable Testing Commands** to **true**.
+4. Set **Enable Developer Mode** to **true**.
+5. Select **Save**.
 3. Add the manifest to your instance using the following command: `/apps debug-add-manifest --url BASE/manifest`.
 4. Run the following slash command in Mattermost: `/apps install --app-id com.mattermost.servicenow`.
 5. Use `1234` as the esecret key.
