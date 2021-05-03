@@ -1,4 +1,4 @@
-# Service Now App
+# ServiceNow App
 
 A ServiceNow app for Mattermost.
 
@@ -41,6 +41,8 @@ To disconnect your account, run `/com.mattermost.servicenow disconnect`.
 ## Development
 
 ### Local development install
+
+Download/clone this app's repo. In the repo folder, run the `make` command on your command line.
 
 1. Running `make` will build the executable and start the server.
   - A base URL can be added so links are sent based on that url (e.g. `make BASE=http://myurl.com`). Defaults to `http://localhost:3000`.
