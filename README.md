@@ -21,15 +21,15 @@ This guide is intended for Mattermost System Admins setting up the ServiceNow ap
 1. OAuth must be configured to use ServiceNow. In order to configure ServiceNow, refer to the [ServiceNow documentation](https://docs.servicenow.com/bundle/paris-platform-administration/page/administer/security/task/t_CreateEndpointforExternalClients.html).
 2. For a redirect URL use `MATTERMOSTURL/plugins/com.mattermost.apps/apps/com.mattermost.servicenow/oauth2/remote/complete`.
 3. In Mattermost, run the command `/servicenow configure oauth` and introduce the required fields.
-  - `Instance URL` is the URL for your servicenow instance.
-  - `Client ID` is the client ID generated on step 1.
-  - `Client Secret` is the client secret generated on step 1.
+  - `Instance URL` is the URL for your ServiceNow instance.
+  - `Client ID` is the client ID generated in step 1.
+  - `Client Secret` is the client secret generated in step 1.
 
 ## User's Guide
 
 This guide is intended for Mattermost users who want information about the app's functionality, and Mattermost users who want to connect their ServiceNow account to Mattermost. Connect your ServiceNow account to Mattermost using: `/com.mattermost.servicenow connect` and follow the instructions provided.
 
-To disconnect the account, run `/com.mattermost.servicenow disconnect`.
+To disconnect your account, run `/com.mattermost.servicenow disconnect`.
 
 ### Usage
 
@@ -44,8 +44,8 @@ To disconnect the account, run `/com.mattermost.servicenow disconnect`.
 
 1. Running `make` will build the executable and start the server.
   - A base URL can be added so links are sent based on that url (e.g. `make BASE=http://myurl.com`). Defaults to `http://localhost:3000`.
-  - An address can be added for the "ListenAndServe" function (e.g. `make ADDR=:3000`). Defaults to `:3000`.
-2. Set up your instance to use the Apps Framework debug commands:
+  - An address can be added for the `ListenAndServe` function (e.g. `make ADDR=:3000`). Defaults to `:3000`.
+2. Set up your instance to use the apps framework debug commands:
   - Go to **System Console > Environment > Developer**.
   - Set **Enable Testing Commands** to **true**.
   - Set **Enable Developer Mode** to **true**.
@@ -56,4 +56,4 @@ To disconnect the account, run `/com.mattermost.servicenow disconnect`.
 
 ### Provision
 
-To provision this PR to AWS run `make dist` to generate the App bundle and then follow the steps [here](https://github.com/mattermost/mattermost-plugin-apps#provisioning).
+To provision this PR to AWS run `make dist` to generate the app bundle and then follow the steps [here](https://github.com/mattermost/mattermost-plugin-apps#provisioning).
