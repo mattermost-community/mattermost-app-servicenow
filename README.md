@@ -47,7 +47,7 @@ To disconnect the account, run `/com.mattermost.servicenow disconnect`.
   - An address can be added for the "ListenAndServe" function (e.g. `make ADDR=:3000`). Defaults to `:3000`.
 2. Set up your instance to use the Apps Framework debug commands.
 3. Add the manifest to your instance using the following command: `/apps debug-add-manifest --url BASE/manifest`.
-4. Run the following command in Mattermost: `/apps install --app-id com.mattermost.servicenow`.
+4. Run the following slash command in Mattermost: `/apps install --app-id com.mattermost.servicenow`.
 5. Use `1234` as the esecret key.
 
 ### Provision
