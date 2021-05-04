@@ -39,7 +39,7 @@ The connect call will:
 
 The complete call will:
 - Get the code from the call values.
-- Create the oauth configuration using the information in the context.
+- Create the OAuth configuration using the information in the context.
 - Generate the token out of the code and the OAuth configuration.
 - Store the token directly as the OAuth user information service provided by Mattermost.
 
