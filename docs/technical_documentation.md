@@ -2,7 +2,7 @@
 
 ## Main functionality
 
-- OAuth connection with one Servicenow instance.
+- OAuth connection with one ServiceNow instance.
 - Creation of tickets on a predefined table (incidents).
 
 ## Code overview
