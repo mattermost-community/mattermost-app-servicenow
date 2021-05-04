@@ -14,7 +14,7 @@ This repository is licensed under the [Apache 2.0 License](https://github.com/ma
 
 ## Admin Guide
 
-This guide is intended for Mattermost System Admins setting up the ServiceNow app. For more information about contributing to this plugin, visit the [Development section](#development). For more information about the ServiceNow app, read the [technical guide](../docs/technical_documentation).
+This guide is intended for Mattermost System Admins setting up the ServiceNow app. For more information about contributing to this plugin, visit the [Development section](#development). For more information about the ServiceNow app, read the [technical guide](docs/technical_documentation.md).
 
 ### Setting up
 
