@@ -1,4 +1,4 @@
-# ServiceNow app Technical Documentation
+# ServiceNow App Technical Documentation
 
 ## Main functionality
 
