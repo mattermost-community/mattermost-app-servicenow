@@ -8,7 +8,7 @@
 ## Code overview
 
 - App package:
-  - Contains the business logic of the App. Handles OAuth information, transformation between tables and bindings, and checks on user connection.
+  - Contains the business logic of the app. Handles OAuth information, transformation between tables and bindings, and checks on user connection.
 - Clients package:
   - Contains the external clients used by the app. Right now only the ServiceNow client.
   - It also defines the models used by the client (e.g. Ticket model on ServiceNow side).
