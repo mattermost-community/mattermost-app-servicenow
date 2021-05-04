@@ -35,7 +35,7 @@ The connect command generates an ephemeral message with the link to start the OA
 The connect call will:
 - Create the oauth configuration using the information in the context.
 - Fetch the state from the call values and fail in case it doesn't exist.
-- Return the AuthCodeURL to Mattermost.
+- Return the `AuthCodeURL` to Mattermost.
 
 The complete call will:
 - Get the code from the call values.
