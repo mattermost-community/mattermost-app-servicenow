@@ -17,7 +17,7 @@
 - Constants package:
   - Stores all the constant values used by the app.
 - Routers package:
-  - Contain all the routers that accept external input. Right now only covers Mattermost (AWS apps should only receive information from Mattermost).
+  - Contains all the routers that accept external input. Right now only covers Mattermost (AWS apps should only receive information from Mattermost).
   - It creates the router and handles all calls, including bindings.
 - Utils package:
   - Several util functions, mainly covering HTTP responses writing, path handling for bindings, and others.
