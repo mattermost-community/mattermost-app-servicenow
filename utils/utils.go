@@ -3,9 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"log"
-	"strings"
-
-	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
 func GetStringFromMapInterface(in map[string]interface{}, key, def string) string {
@@ -24,10 +21,6 @@ func GetStringFromMapInterface(in map[string]interface{}, key, def string) strin
 	}
 
 	return out
-}
-
-func GetIconURL(name string, cc *apps.Context) string {
-	return strings.TrimRight(cc.MattermostSiteURL, "/") + cc.AppPath + "/static/" + name
 }
 
 func DumpObject(c interface{}) {
