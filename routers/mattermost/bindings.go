@@ -15,7 +15,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 		Label:       constants.CommandTrigger,
 		Location:    constants.CommandTrigger,
 		Description: "Create incidents in your ServiceNow instance",
-		Icon:        utils.GetIconURL("now-mobile-icon.png", c.Context),
+		Icon:        "now-mobile-icon.png",
 	}
 
 	commands := &apps.Binding{
@@ -78,18 +78,18 @@ func generateTableBindingsCalls(b *apps.Binding) *apps.Binding {
 	return b
 }
 
-func getSysAdminCommandBindings(cc *apps.Context) *apps.Binding {
+func getSysAdminCommandBindings(_ *apps.Context) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationConfigure,
 		Label:       "config",
-		Icon:        utils.GetIconURL("now-mobile-icon.png", cc),
+		Icon:        "now-mobile-icon.png",
 		Hint:        "",
 		Description: "Configure the plugin",
 		Bindings: []*apps.Binding{
 			{
 				Location:    constants.LocationConfigureOAuth,
 				Label:       "oauth",
-				Icon:        utils.GetIconURL("now-mobile-icon.png", cc),
+				Icon:        "now-mobile-icon.png",
 				Hint:        "",
 				Description: "Configure OAuth options",
 				Call:        getConfigureOAuthCall(formActionOpen),
@@ -97,11 +97,11 @@ func getSysAdminCommandBindings(cc *apps.Context) *apps.Binding {
 		},
 	}
 }
-func getConnectBinding(cc *apps.Context) *apps.Binding {
+func getConnectBinding(_ *apps.Context) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationConnect,
 		Label:       "connect",
-		Icon:        utils.GetIconURL("now-mobile-icon.png", cc),
+		Icon:        "now-mobile-icon.png",
 		Hint:        "",
 		Description: "Connect your ServiceNow account",
 		Form:        &apps.Form{},
@@ -109,11 +109,11 @@ func getConnectBinding(cc *apps.Context) *apps.Binding {
 	}
 }
 
-func getDisconnectBinding(cc *apps.Context) *apps.Binding {
+func getDisconnectBinding(_ *apps.Context) *apps.Binding {
 	return &apps.Binding{
 		Location:    constants.LocationDisconnect,
 		Label:       "disconnect",
-		Icon:        utils.GetIconURL("now-mobile-icon.png", cc),
+		Icon:        "now-mobile-icon.png",
 		Hint:        "",
 		Description: "Disconnect from ServiceNow",
 		Form:        &apps.Form{},

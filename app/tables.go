@@ -5,7 +5,6 @@ import (
 
 	"github.com/mattermost/mattermost-app-servicenow/config"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
-	"github.com/mattermost/mattermost-app-servicenow/utils"
 )
 
 func GetTablesBindings(cc *apps.Context) (post, command, header *apps.Binding) {
@@ -20,16 +19,16 @@ func GetTablesBindings(cc *apps.Context) (post, command, header *apps.Binding) {
 	return
 }
 
-func baseBinding(label string, cc *apps.Context) *apps.Binding {
+func baseBinding(label string, _ *apps.Context) *apps.Binding {
 	return &apps.Binding{
 		Location: constants.LocationCreate,
 		Label:    label,
-		Icon:     utils.GetIconURL("now-mobile-icon.png", cc),
+		Icon:     "now-mobile-icon.png",
 		Bindings: []*apps.Binding{},
 	}
 }
 
-func subBindings(tt config.TablesConfig, base *apps.Binding, useLocationLabel bool, cc *apps.Context) *apps.Binding {
+func subBindings(tt config.TablesConfig, base *apps.Binding, useLocationLabel bool, _ *apps.Context) *apps.Binding {
 	switch len(tt) {
 	case 0:
 		return nil
@@ -52,7 +51,7 @@ func subBindings(tt config.TablesConfig, base *apps.Binding, useLocationLabel bo
 		base.Bindings = append(base.Bindings, &apps.Binding{
 			Location: apps.Location(t.ID),
 			Label:    label,
-			Icon:     utils.GetIconURL("now-mobile-icon.png", cc),
+			Icon:     "now-mobile-icon.png",
 			Call: &apps.Call{
 				Path: t.ID,
 			},
