@@ -10,8 +10,7 @@
     "requested_permissions": [
         "act_as_bot",
         "remote_oauth2",
-        "act_as_user",
-        "act_as_admin"
+        "act_as_user"
     ],
     "requested_locations": [
         "/command",
