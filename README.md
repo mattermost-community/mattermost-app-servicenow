@@ -19,7 +19,7 @@ This guide is intended for Mattermost System Admins setting up the ServiceNow ap
 ### Setting up
 
 1. OAuth must be configured to use ServiceNow. In order to configure ServiceNow, refer to the [ServiceNow documentation](https://docs.servicenow.com/bundle/paris-platform-administration/page/administer/security/task/t_CreateEndpointforExternalClients.html).
-2. For a redirect URL use `MATTERMOSTURL/plugins/com.mattermost.apps/apps/com.mattermost.servicenow/oauth2/remote/complete`.
+2. For a redirect URL use `MATTERMOSTURL/plugins/com.mattermost.apps/apps/servicenow/oauth2/remote/complete`.
 3. In Mattermost, run the command `/servicenow configure oauth` and introduce the required fields.
   - `Instance URL` is the URL for your ServiceNow instance.
   - `Client ID` is the client ID generated in step 1.
@@ -27,9 +27,9 @@ This guide is intended for Mattermost System Admins setting up the ServiceNow ap
 
 ## User's Guide
 
-This guide is intended for Mattermost users who want information about the app's functionality, and Mattermost users who want to connect their ServiceNow account to Mattermost. Connect your ServiceNow account to Mattermost using: `/com.mattermost.servicenow connect` and follow the instructions provided.
+This guide is intended for Mattermost users who want information about the app's functionality, and Mattermost users who want to connect their ServiceNow account to Mattermost. Connect your ServiceNow account to Mattermost using: `/servicenow connect` and follow the instructions provided.
 
-To disconnect your account, run `/com.mattermost.servicenow disconnect`.
+To disconnect your account, run `/servicenow disconnect`.
 
 ### Usage
 
@@ -52,9 +52,8 @@ Download/clone this app's repo. In the repo folder, run the `make` command on yo
   - Set **Enable Testing Commands** to **true**.
   - Set **Enable Developer Mode** to **true**.
   - Select **Save**.
-3. Add the manifest to your instance using the following command: `/apps debug-add-manifest --url BASE/manifest`.
-4. Run the following slash command in Mattermost: `/apps install --app-id com.mattermost.servicenow`.
-5. Use `1234` as the secret key.
+3. Run the following slash command in Mattermost: `/apps install http $BASE/manifest`.
+4. Use `1234` as the secret key.
 
 ### Provision
 
