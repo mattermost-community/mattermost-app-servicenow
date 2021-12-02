@@ -11,18 +11,11 @@ import (
 )
 
 func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
-	baseCommand := &apps.Binding{
+	baseCommand := apps.Binding{
 		Label:       constants.CommandTrigger,
 		Location:    constants.CommandTrigger,
 		Description: "Create incidents in your ServiceNow instance",
 		Icon:        "now-mobile-icon.png",
-	}
-
-	commands := &apps.Binding{
-		Location: apps.LocationCommand,
-		Bindings: []*apps.Binding{
-			baseCommand,
-		},
 	}
 
 	connectionCommand := getConnectBinding(c.Context)
@@ -38,27 +31,34 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 		baseCommand.Bindings = append(baseCommand.Bindings, getSysAdminCommandBindings(c.Context))
 	}
 
-	out := []*apps.Binding{}
+	out := []apps.Binding{}
 
 	if app.IsUserConnected(c.Context) {
 		postBindings, commandBindings, headerBindings := app.GetTablesBindings(c.Context)
 		if postBindings != nil {
-			out = append(out, &apps.Binding{
+			out = append(out, apps.Binding{
 				Location: apps.LocationPostMenu,
-				Bindings: []*apps.Binding{generateTableBindingsCalls(postBindings)},
+				Bindings: []apps.Binding{generateTableBindingsCalls(*postBindings)},
 			})
 		}
 
 		if commandBindings != nil {
-			baseCommand.Bindings = append(baseCommand.Bindings, generateTableBindingsCalls(commandBindings))
+			baseCommand.Bindings = append(baseCommand.Bindings, generateTableBindingsCalls(*commandBindings))
 		}
 
 		if headerBindings != nil {
-			out = append(out, &apps.Binding{
+			out = append(out, apps.Binding{
 				Location: apps.LocationChannelHeader,
-				Bindings: []*apps.Binding{generateTableBindingsCalls(headerBindings)},
+				Bindings: []apps.Binding{generateTableBindingsCalls(*headerBindings)},
 			})
 		}
+	}
+
+	commands := apps.Binding{
+		Location: apps.LocationCommand,
+		Bindings: []apps.Binding{
+			baseCommand,
+		},
 	}
 
 	out = append(out, commands)
@@ -66,7 +66,7 @@ func fBindings(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 	utils.WriteBindings(w, out)
 }
 
-func generateTableBindingsCalls(b *apps.Binding) *apps.Binding {
+func generateTableBindingsCalls(b apps.Binding) apps.Binding {
 	if len(b.Bindings) == 0 {
 		b.Call = getCreateTicketCall(b.Call.Path, formActionOpen)
 	}
@@ -78,27 +78,25 @@ func generateTableBindingsCalls(b *apps.Binding) *apps.Binding {
 	return b
 }
 
-func getSysAdminCommandBindings(_ *apps.Context) *apps.Binding {
-	return &apps.Binding{
+func getSysAdminCommandBindings(_ apps.Context) apps.Binding {
+	return apps.Binding{
 		Location:    constants.LocationConfigure,
 		Label:       "config",
 		Icon:        "now-mobile-icon.png",
 		Hint:        "",
 		Description: "Configure the plugin",
-		Bindings: []*apps.Binding{
-			{
-				Location:    constants.LocationConfigureOAuth,
-				Label:       "oauth",
-				Icon:        "now-mobile-icon.png",
-				Hint:        "",
-				Description: "Configure OAuth options",
-				Call:        getConfigureOAuthCall(formActionOpen),
-			},
-		},
+		Bindings: []apps.Binding{{
+			Location:    constants.LocationConfigureOAuth,
+			Label:       "oauth",
+			Icon:        "now-mobile-icon.png",
+			Hint:        "",
+			Description: "Configure OAuth options",
+			Call:        getConfigureOAuthCall(formActionOpen),
+		}},
 	}
 }
-func getConnectBinding(_ *apps.Context) *apps.Binding {
-	return &apps.Binding{
+func getConnectBinding(_ apps.Context) apps.Binding {
+	return apps.Binding{
 		Location:    constants.LocationConnect,
 		Label:       "connect",
 		Icon:        "now-mobile-icon.png",
@@ -109,8 +107,8 @@ func getConnectBinding(_ *apps.Context) *apps.Binding {
 	}
 }
 
-func getDisconnectBinding(_ *apps.Context) *apps.Binding {
-	return &apps.Binding{
+func getDisconnectBinding(_ apps.Context) apps.Binding {
+	return apps.Binding{
 		Location:    constants.LocationDisconnect,
 		Label:       "disconnect",
 		Icon:        "now-mobile-icon.png",

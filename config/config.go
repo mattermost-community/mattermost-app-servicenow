@@ -21,18 +21,18 @@ type LocalConfig struct {
 	BotID          string
 }
 
-func ServiceNowInstance(cc *apps.Context) string {
+func ServiceNowInstance(cc apps.Context) string {
 	c := load(cc)
 	return c.ServiceNowInstance
 }
 
-func SetServiceNowInstance(s string, cc *apps.Context) {
+func SetServiceNowInstance(s string, cc apps.Context) {
 	c := load(cc)
 	c.ServiceNowInstance = s
 	save(c, cc)
 }
 
-func save(c config, cc *apps.Context) {
+func save(c config, cc apps.Context) {
 	dat, err := json.Marshal(c)
 	if err != nil {
 		log.Printf("Could not marshal config: %v", err)
@@ -45,7 +45,7 @@ func save(c config, cc *apps.Context) {
 	}
 }
 
-func load(cc *apps.Context) config {
+func load(cc apps.Context) config {
 	defaultConfig := config{}
 
 	dat, err := store.LoadConfig(cc)

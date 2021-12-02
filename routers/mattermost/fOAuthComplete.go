@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/apps/mmclient"
+	"github.com/mattermost/mattermost-plugin-apps/apps/appclient"
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/utils"
@@ -28,9 +28,9 @@ func fOAuthComplete(w http.ResponseWriter, r *http.Request, c *apps.CallRequest)
 		return
 	}
 
-	client := mmclient.AsActingUser(c.Context)
+	client := appclient.AsActingUser(c.Context)
 
-	err = client.StoreOAuth2User(c.Context.AppID, token)
+	err = client.StoreOAuth2User(token)
 	if err != nil {
 		errMsg := fmt.Sprintf("Error storing the user: %v", err)
 		utils.WriteCallErrorResponse(w, errMsg)

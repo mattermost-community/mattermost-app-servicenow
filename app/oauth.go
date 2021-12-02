@@ -10,7 +10,7 @@ import (
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
-func GetOAuthConfig(cc *apps.Context) *oauth2.Config {
+func GetOAuthConfig(cc apps.Context) *oauth2.Config {
 	instance := config.ServiceNowInstance(cc)
 
 	return &oauth2.Config{
@@ -24,7 +24,7 @@ func GetOAuthConfig(cc *apps.Context) *oauth2.Config {
 	}
 }
 
-func GetTokenFromContext(cc *apps.Context) *oauth2.Token {
+func GetTokenFromContext(cc apps.Context) *oauth2.Token {
 	token := &oauth2.Token{}
 
 	b, err := json.Marshal(cc.OAuth2.User)

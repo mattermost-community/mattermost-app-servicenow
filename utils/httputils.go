@@ -9,14 +9,13 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/server/utils/md"
 )
 
 func WriteCallResponse(w http.ResponseWriter, v apps.CallResponse) {
 	writeJSON(w, v)
 }
 
-func WriteBindings(w http.ResponseWriter, v []*apps.Binding) {
+func WriteBindings(w http.ResponseWriter, v []apps.Binding) {
 	call := apps.CallResponse{
 		Type: apps.CallResponseTypeOK,
 		Data: v,
@@ -48,7 +47,7 @@ func WriteCallStandardResponse(w http.ResponseWriter, message string) {
 func newCallStandardResponse(message string) apps.CallResponse {
 	return apps.CallResponse{
 		Type:     apps.CallResponseTypeOK,
-		Markdown: md.MD(message),
+		Markdown: message,
 	}
 }
 

@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/apps/mmclient"
+	"github.com/mattermost/mattermost-plugin-apps/apps/appclient"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 
@@ -24,7 +24,7 @@ type Client struct {
 
 var ErrUnexpectedStatus = errors.New("returned with unexpected status")
 
-func NewClient(cc *apps.Context) *Client {
+func NewClient(cc apps.Context) *Client {
 	ctx := context.Background()
 	oAuthConf := app.GetOAuthConfig(cc)
 
@@ -42,7 +42,7 @@ func NewClient(cc *apps.Context) *Client {
 	}
 }
 
-func (c *Client) CreateIncident(table string, v interface{}, cc *apps.Context) (string, error) {
+func (c *Client) CreateIncident(table string, v interface{}, cc apps.Context) (string, error) {
 	url := fmt.Sprintf("%s%s/%s", config.ServiceNowInstance(cc), "/api/now/table", table)
 
 	b, err := json.Marshal(v)
@@ -58,7 +58,7 @@ func (c *Client) CreateIncident(table string, v interface{}, cc *apps.Context) (
 
 	tok, _ := c.tokenSource.Token()
 	if tok.AccessToken != c.original.AccessToken {
-		_ = mmclient.AsActingUser(cc).StoreOAuth2User(cc.AppID, tok)
+		_ = appclient.AsActingUser(cc).StoreOAuth2User(tok)
 	}
 
 	if resp.StatusCode != http.StatusCreated {

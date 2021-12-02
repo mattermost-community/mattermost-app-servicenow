@@ -2,12 +2,12 @@ package store
 
 import (
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/apps/mmclient"
+	"github.com/mattermost/mattermost-plugin-apps/apps/appclient"
 )
 
-func SaveConfig(conf []byte, cc *apps.Context) error {
-	c := mmclient.AsBot(cc)
-	_, err := c.KVSet("config", "", map[string]interface{}{"config": conf})
+func SaveConfig(conf []byte, cc apps.Context) error {
+	c := appclient.AsBot(cc)
+	_, err := c.KVSet("", "config", map[string]interface{}{"config": conf})
 
 	if err != nil {
 		return err
@@ -16,11 +16,11 @@ func SaveConfig(conf []byte, cc *apps.Context) error {
 	return nil
 }
 
-func LoadConfig(cc *apps.Context) ([]byte, error) {
-	c := mmclient.AsBot(cc)
+func LoadConfig(cc apps.Context) ([]byte, error) {
+	c := appclient.AsBot(cc)
 	stored := map[string][]byte{}
 
-	err := c.KVGet("config", "", &stored)
+	err := c.KVGet("", "config", &stored)
 	if err != nil {
 		return nil, err
 	}

@@ -56,17 +56,17 @@ func fCreateTicketSubmit(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 		postField = c.Context.ExpandedContext.Post.Message
 	}
 
-	fields := []*apps.Field{}
+	fields := []apps.Field{}
 
 	for _, v := range t.Fields {
-		field := *v
+		field := v
 		field.Value = c.GetValue(v.Name, "")
 
 		if t.PostDefault == v.Name && len(postField) != 0 {
 			field.Value = postField
 		}
 
-		fields = append(fields, &field)
+		fields = append(fields, field)
 	}
 
 	utils.WriteCallResponse(w, apps.CallResponse{
@@ -98,7 +98,7 @@ func fCreateTicketForm(w http.ResponseWriter, r *http.Request, c *apps.CallReque
 	})
 }
 
-func getCreateTicketForm(fields []*apps.Field, table string, action formAction) *apps.Form {
+func getCreateTicketForm(fields []apps.Field, table string, action formAction) *apps.Form {
 	return &apps.Form{
 		Title:  "Create ticket",
 		Fields: fields,

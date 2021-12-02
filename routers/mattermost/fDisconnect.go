@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/apps/mmclient"
+	"github.com/mattermost/mattermost-plugin-apps/apps/appclient"
 
 	"github.com/mattermost/mattermost-app-servicenow/app"
 	"github.com/mattermost/mattermost-app-servicenow/constants"
@@ -18,9 +18,9 @@ func fDisconnect(w http.ResponseWriter, r *http.Request, c *apps.CallRequest) {
 		return
 	}
 
-	client := mmclient.AsActingUser(c.Context)
+	client := appclient.AsActingUser(c.Context)
 
-	err := client.StoreOAuth2User(c.Context.AppID, nil)
+	err := client.StoreOAuth2User(nil)
 	if err != nil {
 		utils.WriteCallErrorResponse(w, fmt.Sprintf("Cannot disconnect. Error: %v", err))
 		return

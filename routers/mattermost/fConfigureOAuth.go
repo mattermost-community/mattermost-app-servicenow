@@ -64,33 +64,29 @@ func fConfigureOAuthForm(w http.ResponseWriter, r *http.Request, c *apps.CallReq
 	})
 }
 
-func getConfigureOAuthForm(v map[string]interface{}, action formAction, cc *apps.Context) *apps.Form {
+func getConfigureOAuthForm(v map[string]interface{}, action formAction, cc apps.Context) *apps.Form {
 	return &apps.Form{
 		Title: "Configure OAuth",
-		Fields: []*apps.Field{
-			{
-				Name:       configureOAuthServiceNowInstanceValue,
-				Label:      configureOAuthServiceNowInstanceValue,
-				ModalLabel: "Service Now Instance",
-				Type:       apps.FieldTypeText,
-				Value:      utils.GetStringFromMapInterface(v, configureOAuthServiceNowInstanceValue, config.ServiceNowInstance(cc)),
-			},
-			{
-				Name:       configureOAuthClientIDValue,
-				Label:      configureOAuthClientIDValue,
-				ModalLabel: "Client ID",
-				Type:       apps.FieldTypeText,
-				Value:      utils.GetStringFromMapInterface(v, configureOAuthClientIDValue, cc.OAuth2.ClientID),
-			},
-			{
-				Name:        configureOAuthClientSecretValue,
-				Label:       configureOAuthClientSecretValue,
-				ModalLabel:  "Client Secret",
-				Type:        apps.FieldTypeText,
-				TextSubtype: "password",
-				Value:       utils.GetStringFromMapInterface(v, configureOAuthClientSecretValue, cc.OAuth2.ClientSecret),
-			},
-		},
+		Fields: []apps.Field{{
+			Name:       configureOAuthServiceNowInstanceValue,
+			Label:      configureOAuthServiceNowInstanceValue,
+			ModalLabel: "Service Now Instance",
+			Type:       apps.FieldTypeText,
+			Value:      utils.GetStringFromMapInterface(v, configureOAuthServiceNowInstanceValue, config.ServiceNowInstance(cc)),
+		}, {
+			Name:       configureOAuthClientIDValue,
+			Label:      configureOAuthClientIDValue,
+			ModalLabel: "Client ID",
+			Type:       apps.FieldTypeText,
+			Value:      utils.GetStringFromMapInterface(v, configureOAuthClientIDValue, cc.OAuth2.ClientID),
+		}, {
+			Name:        configureOAuthClientSecretValue,
+			Label:       configureOAuthClientSecretValue,
+			ModalLabel:  "Client Secret",
+			Type:        apps.FieldTypeText,
+			TextSubtype: "password",
+			Value:       utils.GetStringFromMapInterface(v, configureOAuthClientSecretValue, cc.OAuth2.ClientSecret),
+		}},
 		Call: getConfigureOAuthCall(action),
 	}
 }

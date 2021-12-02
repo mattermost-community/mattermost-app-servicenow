@@ -17,14 +17,19 @@
         "/channel_header",
         "/post_menu"
     ],
-    "aws_lambda": [
-        {
-            "path": "/",
-            "name": "go-function",
-            "handler": "mattermost-app-servicenow",
-            "runtime": "go1.x"
-        }
-    ],
+    "http": {
+        "use_jwt": true
+	},
+    "aws_lambda": {
+        "functions": [
+            {
+                "path": "/",
+                "name": "go-function",
+                "handler": "mattermost-app-servicenow",
+                "runtime": "go1.x"
+            }
+        ]
+    },
     "get_oauth2_connect_url": {
         "path": "/oauth2/connect",
         "expand": {
