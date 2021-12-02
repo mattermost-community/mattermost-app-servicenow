@@ -52,7 +52,7 @@ Download/clone this app's repo. In the repo folder, run the `make` command on yo
   - Set **Enable Testing Commands** to **true**.
   - Set **Enable Developer Mode** to **true**.
   - Select **Save**.
-3. Run the following slash command in Mattermost: `/apps install http $BASE/manifest`.
+3. Run the following slash command in Mattermost: `/apps install http $BASE/manifest.json`.
 4. Use `1234` as the secret key.
 
 ### Provision

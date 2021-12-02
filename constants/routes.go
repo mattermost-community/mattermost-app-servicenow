@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	ManifestPath    = "/manifest"
+	ManifestPath    = "/manifest.json"
 	InstallPath     = "/install"
 	BindingsPath    = "/bindings"
 	StaticAssetPath = "/static"
