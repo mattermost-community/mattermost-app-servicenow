@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -65,7 +66,10 @@ func main() {
 
 		manifest.HTTP.RootURL = baseURL
 
-		_ = http.ListenAndServe(addr, nil)
+		fmt.Println("Listening on", addr)
+		fmt.Println("Use '/apps install http http://localhost" + addr + "/manifest.json' to install the app")
+
+		log.Fatal(http.ListenAndServe(addr, nil))
 
 		return
 	}
