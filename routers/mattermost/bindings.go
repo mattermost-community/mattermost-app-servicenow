@@ -84,7 +84,7 @@ func getSysAdminCommandBindings(_ apps.Context) apps.Binding {
 		Label:       "config",
 		Icon:        "now-mobile-icon.png",
 		Hint:        "",
-		Description: "Configure the plugin",
+		Description: "Configure the app",
 		Bindings: []apps.Binding{{
 			Location:    constants.LocationConfigureOAuth,
 			Label:       "oauth",
