@@ -49,15 +49,20 @@ func save(c config, cc apps.Context) {
 func load(cc apps.Context) config {
 	defaultConfig := config{}
 
-	dat, err := store.LoadConfig(cc)
+	data, err := store.LoadConfig(cc)
 	if err != nil {
 		log.Printf("Could not load config: %v", err)
 		return defaultConfig
 	}
 
-	c := config{}
+	// No config stored yet
+	if len(data) == 0 {
+		return defaultConfig
+	}
 
-	err = json.Unmarshal(dat, &c)
+	var c config
+
+	err = json.Unmarshal(data, &c)
 	if err != nil {
 		log.WithError(err).Warn("Could not unmarshal config")
 		return defaultConfig
