@@ -3,8 +3,9 @@ package mattermost
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 	"github.com/mattermost/mattermost-plugin-apps/apps/appclient"
@@ -32,10 +33,9 @@ func fOAuthComplete(w http.ResponseWriter, r *http.Request, c *apps.CallRequest)
 
 	err = client.StoreOAuth2User(token)
 	if err != nil {
-		errMsg := fmt.Sprintf("Error storing the user: %v", err)
-		utils.WriteCallErrorResponse(w, errMsg)
-		log.Printf(errMsg, err)
+		log.WithError(err).Warn("Error storing the user")
 
+		utils.WriteCallErrorResponse(w, fmt.Sprintf("Error storing the user: %v", err))
 		return
 	}
 

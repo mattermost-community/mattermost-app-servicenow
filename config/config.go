@@ -2,11 +2,12 @@ package config
 
 import (
 	"encoding/json"
-	"log"
 
-	"github.com/mattermost/mattermost-app-servicenow/store"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
+
+	"github.com/mattermost/mattermost-app-servicenow/store"
 )
 
 type config struct {
@@ -58,7 +59,7 @@ func load(cc apps.Context) config {
 
 	err = json.Unmarshal(dat, &c)
 	if err != nil {
-		log.Printf("Could not unmarshal config: %v", err)
+		log.WithError(err).Warn("Could not unmarshal config")
 		return defaultConfig
 	}
 
