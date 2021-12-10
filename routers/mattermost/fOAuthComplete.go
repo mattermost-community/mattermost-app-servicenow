@@ -36,6 +36,7 @@ func fOAuthComplete(w http.ResponseWriter, r *http.Request, c *apps.CallRequest)
 		log.WithError(err).Warn("Error storing the user")
 
 		utils.WriteCallErrorResponse(w, fmt.Sprintf("Error storing the user: %v", err))
+
 		return
 	}
 
