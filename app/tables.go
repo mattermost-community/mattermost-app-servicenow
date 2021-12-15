@@ -21,10 +21,11 @@ func GetTablesBindings(cc apps.Context) (post, command, header *apps.Binding) {
 
 func baseBinding(label string, _ apps.Context) apps.Binding {
 	return apps.Binding{
-		Location: constants.LocationCreate,
-		Label:    label,
-		Icon:     "now-mobile-icon.png",
-		Bindings: []apps.Binding{},
+		Location:    constants.LocationCreate,
+		Label:       label,
+		Icon:        "now-mobile-icon.png",
+		Description: "Create a new ticket in your ServiceNow instance",
+		Bindings:    []apps.Binding{},
 	}
 }
 
