@@ -96,8 +96,8 @@ func getConfigureOAuthCall(action formAction) *apps.Call {
 		Path: string(constants.BindingPathConfigureOAuth),
 		Expand: &apps.Expand{
 			ActingUser:            apps.ExpandAll,
-			OAuth2App:             apps.ExpandAll,
 			ActingUserAccessToken: apps.ExpandAll,
+			OAuth2App:             apps.ExpandAll,
 		},
 		State: configureOAuthCallState{
 			Action: action,
