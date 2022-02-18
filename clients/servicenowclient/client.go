@@ -8,12 +8,10 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/apps/mmclient"
+	"github.com/mattermost/mattermost-plugin-apps/apps/appclient"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 
-	"github.com/mattermost/mattermost-app-servicenow/app"
-	"github.com/mattermost/mattermost-app-servicenow/config"
 )
 
 type Client struct {
@@ -58,7 +56,7 @@ func (c *Client) CreateIncident(table string, v interface{}, cc *apps.Context) (
 
 	tok, _ := c.tokenSource.Token()
 	if tok.AccessToken != c.original.AccessToken {
-		_ = mmclient.AsActingUser(cc).StoreOAuth2User(cc.AppID, tok)
+		_ = appclient.AsActingUser(cc).StoreOAuth2User(cc.AppID, tok)
 	}
 
 	if resp.StatusCode != http.StatusCreated {
