@@ -3,8 +3,6 @@ package function
 import (
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
-	oauth2api "google.golang.org/api/oauth2/v2"
-	"google.golang.org/api/option"
 
 	"github.com/mattermost/mattermost-app-servicenow/goapp"
 	"github.com/mattermost/mattermost-plugin-apps/apps"
@@ -44,24 +42,14 @@ func oauth2Complete(creq goapp.CallRequest) apps.CallResponse {
 		return apps.NewErrorResponse(errors.Wrap(err, "failed token exchange"))
 	}
 
-	oauth2Service, err := oauth2api.NewService(creq.GoContext,
-		option.WithTokenSource(oauth2Config.TokenSource(creq.GoContext, token)))
-	if err != nil {
-		return apps.NewErrorResponse(errors.Wrap(err, "failed to get OAuth2 service"))
-	}
-	uiService := oauth2api.NewUserinfoService(oauth2Service)
-	ui, err := uiService.V2.Me.Get().Do()
-	if err != nil {
-		return apps.NewErrorResponse(errors.Wrap(err, "failed to get user info"))
-	}
-
 	asActingUser := appclient.AsActingUser(creq.Context)
-	err = asActingUser.StoreOAuth2User(creq.Context.AppID, goapp.User{
-		Token: token,
-		ID:    ui.Id,
-	})
-	if err != nil {
+	user := goapp.User{
+		Token:        token,
+		MattermostID: creq.Context.ActingUserID,
+	}
+	if err = asActingUser.StoreOAuth2User(creq.Context.AppID, user); err != nil {
 		return apps.NewErrorResponse(errors.Wrap(err, "failed to store OAuth user info to Mattermost"))
 	}
+
 	return apps.NewTextResponse("completed connecting to ServiceNow with OAuth2.")
 }

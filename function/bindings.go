@@ -3,6 +3,7 @@ package function
 import (
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 
+	root "github.com/mattermost/mattermost-app-servicenow"
 	"github.com/mattermost/mattermost-app-servicenow/goapp"
 )
 
@@ -13,7 +14,7 @@ func bindings(creq goapp.CallRequest) apps.CallResponse {
 			{
 				Label:       servicenow,
 				Description: "Create incidents in your ServiceNow instance",
-				Icon:        icon,
+				Icon:        root.AppManifest.Icon,
 
 				Bindings: goapp.AppendBindings(
 					commandBindings(creq),
@@ -33,9 +34,10 @@ func commandBindings(creq goapp.CallRequest) []apps.Binding {
 
 	// admin commands
 	if creq.Context.ActingUser != nil && creq.Context.ActingUser.IsSystemAdmin() {
-		bindings = append(bindings) // configure.Binding(creq),
-		// info.Binding(creq),
-
+		bindings = append(bindings,
+			configure.Binding(creq),
+			info.Binding(creq),
+		)
 	}
 
 	// Do not show any more commands unless the app is configured

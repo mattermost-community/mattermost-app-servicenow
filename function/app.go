@@ -2,16 +2,13 @@ package function
 
 import (
 	"github.com/gorilla/mux"
+	root "github.com/mattermost/mattermost-app-servicenow"
 	"github.com/mattermost/mattermost-app-servicenow/goapp"
 	"github.com/mattermost/mattermost-plugin-apps/utils"
-	"github.com/mattermost/mattermost-plugin-apps/utils/httputils"
 )
 
 const servicenow = "servicenow"
 const ServiceNow = "ServiceNow"
-const icon = "icon.png"
-
-var Mode = ""
 
 var BuildHash string
 var BuildHashShort string
@@ -36,29 +33,28 @@ type CallRequest struct {
 	goapp.CallRequest
 }
 
-func InitHTTP(log utils.Logger, r *mux.Route) {
-	// Ping.
-	r.Path("/ping").HandlerFunc(httputils.DoHandleJSONData([]byte("{}")))
+type App struct {
+	goapp.App
+	mode string
+}
 
-	a := goapp.App{
-		Logger: log,
-		Route:  r,
-		Icon:   icon,
+func Init(mode string, r *mux.Router, log utils.Logger) {
+	app := App{
+		mode: mode,
+		App: *goapp.NewApp(r, log).
+			WithManifest(root.AppManifest).
+			WithStatic(root.Static).
+			WithIcon(root.AppManifest.Icon),
 	}
 
 	// Bindings.
-	a.HandleCall("/bindings", bindings)
+	app.HandleCall("/bindings", bindings)
 
-	// OAuth2 (Google Calendar) connect commands and callbacks.
-	a.HandleCall("/oauth2/connect", oauth2Connect)
-	a.HandleCall("/oauth2/complete", oauth2Complete)
+	// OAuth2 callbacks.
+	app.HandleCall("/oauth2/connect", oauth2Connect)
+	app.HandleCall("/oauth2/complete", oauth2Complete)
 
-	// func Init(router *mux.Router, m *apps.Manifest, staticAssets fs.FS, localMode bool) {
-	// 	router.HandleFunc(constants.ManifestPath, fManifest(m))
-	a.HandleCall("/install", install)
-	// 	router.HandleFunc(constants.BindingsPath, extractCall(fBindings, localMode))
-	// 	router.HandleFunc(constants.OAuthPath+constants.OAuthConnectPath, extractCall(fOAuthConnect, localMode))
-	// 	router.HandleFunc(constants.OAuthPath+constants.OAuthCompletePath, extractCall(fOAuthComplete, localMode))
+	app.HandleCall("/install", install)
 
 	// 	router.HandleFunc(constants.BindingPathCreate.Submit(), extractCall(fCreateTicketSubmit, localMode))
 	// 	router.HandleFunc(constants.BindingPathCreate.Form(), extractCall(fCreateTicketForm, localMode))

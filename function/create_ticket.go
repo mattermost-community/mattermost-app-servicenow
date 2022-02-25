@@ -3,23 +3,24 @@ package function
 import (
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 
+	root "github.com/mattermost/mattermost-app-servicenow"
 	"github.com/mattermost/mattermost-app-servicenow/goapp"
 )
 
-func createTicketBinding(creq goapp.CallRequest, root apps.Location) apps.Binding {
+func createTicketBinding(creq goapp.CallRequest, rootLoc apps.Location) apps.Binding {
 	loc := "create-ticket"
 	label := loc
-	if root != apps.LocationCommand {
+	if rootLoc != apps.LocationCommand {
 		label = "Create ServiceNow ticket"
 	}
 
 	b := apps.Binding{
 		Label:    label,
 		Location: apps.Location(loc),
-		Icon:     "now-mobile-icon.png",
+		Icon:     root.AppManifest.Icon,
 	}
 
-	tables := appConfig(creq).Tables.forLocation(root)
+	tables := appConfig(creq).Tables.forLocation(rootLoc)
 	for _, table := range tables {
 		submit := apps.NewCall("create-ticket").WithState(map[string]string{
 			fTable: table.ID,
@@ -33,7 +34,7 @@ func createTicketBinding(creq goapp.CallRequest, root apps.Location) apps.Bindin
 		b.Bindings = append(b.Bindings, apps.Binding{
 			Label:    table.DisplayName,
 			Location: apps.Location(table.ID),
-			Icon:     "now-mobile-icon.png",
+			Icon:     root.AppManifest.Icon,
 			Submit:   submit,
 		})
 	}

@@ -9,7 +9,6 @@ import (
 	"github.com/mattermost/mattermost-plugin-apps/utils"
 	"github.com/mattermost/mattermost-server/v6/plugin"
 
-	root "github.com/mattermost/mattermost-app-servicenow"
 	"github.com/mattermost/mattermost-app-servicenow/function"
 )
 
@@ -18,16 +17,17 @@ type Plugin struct {
 	plugin.MattermostPlugin
 
 	router *mux.Router
+	client *pluginapi.Client
+	log    utils.Logger
 }
 
 func (p *Plugin) OnActivate() error {
 	p.router = mux.NewRouter()
-	function.Mode = "plugin"
+	p.client = pluginapi.NewClient(p.API, p.Driver)
+	p.log = utils.NewPluginLogger(p.client)
 
-	function.InitHTTP(
-		utils.NewPluginLogger(pluginapi.NewClient(p.API, p.Driver)),
-		root.NewAppRoute(p.router, apps.PluginAppPath),
-	)
+	functionRouter := p.router.Path(apps.PluginAppPath).Subrouter()
+	function.Init("plugin", functionRouter, p.log)
 	return nil
 }
 

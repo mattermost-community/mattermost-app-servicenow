@@ -2,6 +2,7 @@ package goapp
 
 import (
 	"encoding/json"
+	"io/fs"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -12,13 +13,38 @@ import (
 )
 
 type App struct {
-	Icon   string
 	Logger utils.Logger
-	Route  *mux.Route
+	Router *mux.Router
+	Icon   string
+}
+
+func NewApp(r *mux.Router, log utils.Logger) *App {
+	// Ping.
+	r.Path("/ping").HandlerFunc(httputils.DoHandleJSONData([]byte("{}")))
+
+	return &App{
+		Router: r,
+		Logger: log,
+	}
+}
+
+func (a *App) WithManifest(m apps.Manifest) *App {
+	a.Router.Path("/manifest.json").HandlerFunc(httputils.DoHandleJSON(m)).Methods("GET")
+	return a
+}
+
+func (a *App) WithStatic(staticFS fs.FS) *App {
+	a.Router.PathPrefix("/static/").Handler(http.FileServer(http.FS(staticFS)))
+	return a
+}
+
+func (a App) WithIcon(iconPath string) *App {
+	a.Icon = iconPath
+	return &a
 }
 
 func (a *App) HandleCall(p string, h HandlerFunc) {
-	a.Route.Path(p).HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	a.Router.Path(p).HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		creq := CallRequest{
 			GoContext: req.Context(),
 		}

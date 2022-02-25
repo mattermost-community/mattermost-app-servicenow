@@ -5,6 +5,7 @@ import (
 )
 
 type User struct {
-	Token *oauth2.Token
-	ID    string
+	MattermostID string
+	RemoteID     string
+	Token        *oauth2.Token
 }

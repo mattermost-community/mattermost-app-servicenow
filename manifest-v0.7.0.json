@@ -15,22 +15,15 @@
         "/channel_header",
         "/post_menu"
     ],
-    "aws_lambda": {
-        "functions": [
-            {
-                "path": "/",
-                "name": "go-function",
-                "handler": "mattermost-app-servicenow",
-                "runtime": "go1.x"
-            }
-        ]
-    },
-    "http": {
-        "root_url": "http://localhost:4445"
-    },
-    "plugin": {
-        "plugin_id": "com.mattermost.app.servicenow"
-    },
+    "app_type": "aws_lambda",
+    "aws_lambda": [
+        {
+            "path": "/",
+            "name": "go-function",
+            "handler": "mattermost-app-servicenow",
+            "runtime": "go1.x"
+        }
+    ],
     "get_oauth2_connect_url": {
         "path": "/oauth2/connect",
         "expand": {
