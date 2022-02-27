@@ -2,21 +2,22 @@ package function
 
 import (
 	"github.com/gorilla/mux"
+
+	"github.com/mattermost/mattermost-plugin-apps/utils"
+
 	root "github.com/mattermost/mattermost-app-servicenow"
 	"github.com/mattermost/mattermost-app-servicenow/goapp"
-	"github.com/mattermost/mattermost-plugin-apps/utils"
 )
 
 var BuildHash string
 var BuildHashShort string
 var BuildDate string
 
-// Field names
+// Field names.
 const (
 	fURL          = "url"
 	fClientID     = "client_id"
 	fClientSecret = "client_secret"
-	fID           = "id"
 	fState        = "state"
 	fCode         = "code"
 	fTable        = "table"

@@ -1,8 +1,9 @@
 package function
 
 import (
-	"github.com/mattermost/mattermost-app-servicenow/goapp"
 	"github.com/mattermost/mattermost-plugin-apps/apps"
+
+	"github.com/mattermost/mattermost-app-servicenow/goapp"
 )
 
 type Tables map[string]Table

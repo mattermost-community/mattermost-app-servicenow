@@ -78,7 +78,8 @@ func RequireConnectedUser(h HandlerFunc) HandlerFunc {
 	return func(creq CallRequest) apps.CallResponse {
 		if creq.Context.OAuth2.User == nil {
 			return apps.NewErrorResponse(
-				utils.NewUnauthorizedError("missing user record, required for " + creq.Path + ". Please use `/apps connect` to connect your ServiceNow account."))
+				utils.NewUnauthorizedError("missing user record, required for " + creq.Path +
+					". Please use `/apps connect` to connect your ServiceNow account."))
 		}
 		return h(creq)
 	}

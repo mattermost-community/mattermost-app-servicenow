@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Tables    Tables
+	Tables Tables
 }
 
 func getAppConfig(creq goapp.CallRequest) Config {
