@@ -105,7 +105,7 @@ func (a *App) createTicketCommandBinding(creq goapp.CallRequest) apps.Binding {
 
 func (a *App) createTicketChannelHeaderBinding(creq goapp.CallRequest) apps.Binding {
 	b := apps.Binding{
-		Label:    "Create ticket",
+		Label:    "Create ServiceNow ticket",
 		Location: apps.Location("create-ticket"),
 		Icon:     a.App.Icon,
 	}
@@ -131,7 +131,7 @@ func (a *App) createTicketChannelHeaderBinding(creq goapp.CallRequest) apps.Bind
 
 func (a *App) createTicketPostMenuBinding(creq goapp.CallRequest) apps.Binding {
 	b := apps.Binding{
-		Label:    "Create ticket",
+		Label:    "Create ServiceNow ticket",
 		Location: apps.Location("create-ticket"),
 		Icon:     a.App.Icon,
 	}

@@ -24,7 +24,7 @@ func (a *App) getBindings(creq goapp.CallRequest) apps.CallResponse {
 		},
 	})
 	bindings = goapp.AppendBinding(bindings, a.postMenuBinding(creq))
-	// bindings = goapp.AppendBinding(bindings, a.channelHeaderBinding(creq))
+	bindings = goapp.AppendBinding(bindings, a.channelHeaderBinding(creq))
 
 	return apps.NewDataResponse(bindings)
 }
