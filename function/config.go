@@ -7,11 +7,10 @@ import (
 )
 
 type Config struct {
-	RemoteURL string
 	Tables    Tables
 }
 
-func appConfig(creq goapp.CallRequest) Config {
+func getAppConfig(creq goapp.CallRequest) Config {
 	conf := Config{}
 	utils.Remarshal(&conf, creq.Context.OAuth2.Data)
 	return conf

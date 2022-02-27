@@ -7,36 +7,36 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/goapp"
 )
 
-func bindings(creq goapp.CallRequest) apps.CallResponse {
+func (a *App) getBindings(creq goapp.CallRequest) apps.CallResponse {
 	bindings := goapp.AppendBinding(nil, &apps.Binding{
 		Location: apps.LocationCommand,
 		Bindings: []apps.Binding{
 			{
-				Label:       servicenow,
+				Label:       "servicenow",
 				Description: "Create incidents in your ServiceNow instance",
 				Icon:        root.AppManifest.Icon,
 
 				Bindings: goapp.AppendBindings(
-					commandBindings(creq),
-					debugCommandBindings(creq),
+					a.commandBindings(creq),
+					a.debugCommandBindings(creq),
 				),
 			},
 		},
 	})
-	bindings = goapp.AppendBinding(bindings, postMenuBinding(creq))
-	bindings = goapp.AppendBinding(bindings, channelHeaderBinding(creq))
+	bindings = goapp.AppendBinding(bindings, a.postMenuBinding(creq))
+	// bindings = goapp.AppendBinding(bindings, a.channelHeaderBinding(creq))
 
 	return apps.NewDataResponse(bindings)
 }
 
-func commandBindings(creq goapp.CallRequest) []apps.Binding {
+func (a *App) commandBindings(creq goapp.CallRequest) []apps.Binding {
 	var bindings []apps.Binding
 
 	// admin commands
 	if creq.Context.ActingUser != nil && creq.Context.ActingUser.IsSystemAdmin() {
 		bindings = append(bindings,
-			configure.Binding(creq),
-			info.Binding(creq),
+			configureCommand.Binding(creq),
+			a.infoCommand().Binding(creq),
 		)
 	}
 
@@ -48,40 +48,41 @@ func commandBindings(creq goapp.CallRequest) []apps.Binding {
 	// user commands
 	if creq.Context.OAuth2.User == nil {
 		// Not connected
-		bindings = append(bindings, goapp.ConnectCommand(ServiceNow).Binding(creq))
-	} else {
-		// Connected
-		bindings = append(bindings, goapp.DisconnectCommand(ServiceNow).Binding(creq))
+		bindings = append(bindings, goapp.ConnectCommand("ServiceNow").Binding(creq))
+		return bindings
 	}
 
+	// Connected
+	bindings = append(bindings, a.createTicketCommandBinding(creq))
+	bindings = append(bindings, goapp.DisconnectCommand("ServiceNow").Binding(creq))
 	return bindings
 }
 
-func postMenuBinding(creq goapp.CallRequest) *apps.Binding {
+func (a *App) postMenuBinding(creq goapp.CallRequest) *apps.Binding {
 	if creq.Context.OAuth2.User == nil {
 		return nil
 	}
 	return &apps.Binding{
 		Location: apps.LocationPostMenu,
 		Bindings: []apps.Binding{
-			createTicketBinding(creq, apps.LocationPostMenu),
+			a.createTicketPostMenuBinding(creq),
 		},
 	}
 }
 
-func channelHeaderBinding(creq goapp.CallRequest) *apps.Binding {
+func (a *App) channelHeaderBinding(creq goapp.CallRequest) *apps.Binding {
 	if creq.Context.OAuth2.User == nil {
 		return nil
 	}
 	return &apps.Binding{
-		Location: apps.LocationPostMenu,
+		Location: apps.LocationChannelHeader,
 		Bindings: []apps.Binding{
-			createTicketBinding(creq, apps.LocationChannelHeader),
+			a.createTicketChannelHeaderBinding(creq),
 		},
 	}
 }
 
-func debugCommandBindings(creq goapp.CallRequest) []apps.Binding {
+func (a *App) debugCommandBindings(creq goapp.CallRequest) []apps.Binding {
 	if !creq.Context.DeveloperMode &&
 		(creq.Context.ActingUser == nil || !creq.Context.ActingUser.IsSystemAdmin()) {
 		return nil

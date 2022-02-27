@@ -20,7 +20,7 @@ func (creq CallRequest) AppendDebugJSON(in []apps.Field) []apps.Field {
 }
 
 func (creq CallRequest) Respond(message string, v interface{}) apps.CallResponse {
-	outJSON := creq.BoolValue("json")
+	outJSON, _ := creq.BoolValue("json")
 	if outJSON {
 		message += "----\n"
 		message += utils.JSONBlock(v)

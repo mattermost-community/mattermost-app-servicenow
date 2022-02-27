@@ -48,6 +48,7 @@
         "path": "/bindings",
         "expand": {
             "acting_user": "all",
+            "oauth2_app": "all",
             "oauth2_user": "all"
         }
     },

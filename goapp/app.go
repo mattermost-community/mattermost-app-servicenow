@@ -1,7 +1,6 @@
 package goapp
 
 import (
-	"encoding/json"
 	"io/fs"
 	"net/http"
 
@@ -41,27 +40,6 @@ func (a *App) WithStatic(staticFS fs.FS) *App {
 func (a App) WithIcon(iconPath string) *App {
 	a.Icon = iconPath
 	return &a
-}
-
-func (a *App) HandleCall(p string, h HandlerFunc) {
-	a.Router.Path(p).HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		creq := CallRequest{
-			GoContext: req.Context(),
-		}
-		err := json.NewDecoder(req.Body).Decode(&creq)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		creq.App = *a
-		creq.App.Logger = a.Logger.With("path", creq.Path)
-
-		cresp := h(creq)
-		if cresp.Type == apps.CallResponseTypeError {
-			creq.App.Logger.WithError(cresp).Debugw("Call failed.")
-		}
-		_ = httputils.WriteJSON(w, cresp)
-	})
 }
 
 func AppendBindings(bb1, bb2 []apps.Binding) []apps.Binding {
