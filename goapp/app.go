@@ -21,6 +21,11 @@ func NewApp(r *mux.Router, log utils.Logger) *App {
 	// Ping.
 	r.Path("/ping").HandlerFunc(httputils.DoHandleJSONData([]byte("{}")))
 
+	r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Debugf("App request: not found: %q", r.URL.String())
+		http.NotFound(w, r)
+	})
+
 	return &App{
 		Router: r,
 		Logger: log,

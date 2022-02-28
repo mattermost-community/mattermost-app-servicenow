@@ -19,8 +19,8 @@
         "functions": [
             {
                 "path": "/",
-                "name": "go-function",
-                "handler": "mattermost-app-servicenow",
+                "name": "servicenow",
+                "handler": "servicenow",
                 "runtime": "go1.x"
             }
         ]

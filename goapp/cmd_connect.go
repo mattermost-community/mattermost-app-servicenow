@@ -44,7 +44,7 @@ func DisconnectCommand(name string) Command {
 			if err != nil {
 				return apps.NewErrorResponse(errors.Wrap(err, "failed to reset the stored user"))
 			}
-			message := fmt.Sprintf("Disconnected your account", creq.Context.OAuth2.ConnectURL)
+			message := "Disconnected your account"
 			if name != "" {
 				message += "from " + name
 			}

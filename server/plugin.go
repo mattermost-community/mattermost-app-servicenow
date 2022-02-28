@@ -26,8 +26,14 @@ func (p *Plugin) OnActivate() error {
 	p.client = pluginapi.NewClient(p.API, p.Driver)
 	p.log = utils.NewPluginLogger(p.client)
 
-	functionRouter := p.router.Path(apps.PluginAppPath).Subrouter()
+	p.router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		p.log.Debugf("Plugin request: not found: %q", r.URL.String())
+		http.NotFound(w, r)
+	})
+
+	functionRouter := mux.NewRouter()
 	function.Init("plugin", functionRouter, p.log)
+	p.router.PathPrefix(apps.PluginAppPath).Handler(http.StripPrefix(apps.PluginAppPath, functionRouter))
 	return nil
 }
 

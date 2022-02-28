@@ -43,11 +43,8 @@ func Init(mode string, r *mux.Router, log utils.Logger) {
 	app.HandleCall("/bindings", app.getBindings)
 
 	// OAuth2 callbacks.
-	app.HandleCall("/oauth2/connect", oauth2Connect)
-	app.HandleCall("/oauth2/complete", oauth2Complete)
-
-	// 	router.HandleFunc(constants.BindingPathCreate.Submit(), extractCall(fCreateTicketSubmit, localMode))
-	// 	router.HandleFunc(constants.BindingPathCreate.Form(), extractCall(fCreateTicketForm, localMode))
+	app.HandleCall("/oauth2/connect", app.oauth2Connect)
+	app.HandleCall("/oauth2/complete", app.oauth2Complete)
 
 	// Command submit handlers.
 	app.HandleCommand(app.infoCommand())
@@ -56,6 +53,8 @@ func Init(mode string, r *mux.Router, log utils.Logger) {
 	app.HandleCommand(goapp.DisconnectCommand("ServiceNow"))
 
 	// Create ticket handlers.
-	app.HandleCall("/create-ticket", goapp.RequireConnectedUser(goapp.CallHandler(createTicketHandler)))
-	app.HandleCall("/form/create-ticket", goapp.FormHandler(app.createTicketFormHandler))
+	app.HandleCall("/create-ticket", goapp.RequireConnectedUser(
+		goapp.CallHandler(app.createTicketHandler)))
+	app.HandleCall("/form/create-ticket",
+		goapp.FormHandler(app.createTicketFormHandler))
 }

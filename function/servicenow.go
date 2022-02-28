@@ -61,7 +61,7 @@ func makeClient(creq goapp.CallRequest) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) CreateIncident(creq goapp.CallRequest, table string, v interface{}) (string, error) {
+func (a *App) CreateIncident(c *Client, creq goapp.CallRequest, table string, v interface{}) (string, error) {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return "", err
@@ -75,7 +75,13 @@ func (c *Client) CreateIncident(creq goapp.CallRequest, table string, v interfac
 
 	tok, _ := c.tokenSource.Token()
 	if tok.AccessToken != c.original.AccessToken {
-		_ = creq.AsActingUser().StoreOAuth2User(creq.Context.AppID, tok)
+		if user := creq.OAuth2User(); user != nil {
+			user.Token = tok
+			err = a.StoreConnectedUser(creq, user)
+			if err != nil {
+				return "", err
+			}
+		}
 	}
 	if resp.StatusCode != http.StatusCreated {
 		return "", fmt.Errorf("%w: %v", ErrUnexpectedStatus, resp.Status)

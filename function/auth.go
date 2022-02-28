@@ -5,7 +5,6 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
-	"github.com/mattermost/mattermost-plugin-apps/apps/appclient"
 
 	"github.com/mattermost/mattermost-app-servicenow/goapp"
 )
@@ -26,7 +25,7 @@ func oauth2Config(creq goapp.CallRequest) (*oauth2.Config, error) {
 	}, nil
 }
 
-func oauth2Connect(creq goapp.CallRequest) apps.CallResponse {
+func (a *App) oauth2Connect(creq goapp.CallRequest) apps.CallResponse {
 	state := creq.GetValue(fState, "")
 	c, err := oauth2Config(creq)
 	if err != nil {
@@ -36,7 +35,7 @@ func oauth2Connect(creq goapp.CallRequest) apps.CallResponse {
 	return apps.NewDataResponse(c.AuthCodeURL(state, oauth2.AccessTypeOffline))
 }
 
-func oauth2Complete(creq goapp.CallRequest) apps.CallResponse {
+func (a *App) oauth2Complete(creq goapp.CallRequest) apps.CallResponse {
 	code := creq.GetValue(fCode, "")
 	oauth2Config, err := oauth2Config(creq)
 	if err != nil {
@@ -48,12 +47,11 @@ func oauth2Complete(creq goapp.CallRequest) apps.CallResponse {
 		return apps.NewErrorResponse(errors.Wrap(err, "failed token exchange"))
 	}
 
-	asActingUser := appclient.AsActingUser(creq.Context)
 	user := goapp.User{
 		Token:        token,
 		MattermostID: creq.Context.ActingUserID,
 	}
-	if err = asActingUser.StoreOAuth2User(creq.Context.AppID, user); err != nil {
+	if err = a.StoreConnectedUser(creq, &user); err != nil {
 		return apps.NewErrorResponse(errors.Wrap(err, "failed to store OAuth user info to Mattermost"))
 	}
 
