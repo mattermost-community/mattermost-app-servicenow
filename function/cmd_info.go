@@ -24,7 +24,8 @@ func (a *App) infoCommand() goapp.Command {
 		Handler: func(creq goapp.CallRequest) apps.CallResponse {
 			message := "ServiceNow App"
 			if BuildDate != "" {
-				message += fmt.Sprintf(": %q %q", BuildDate, BuildHashShort)
+				message += fmt.Sprintf(" built: %s from [%s](https://github.com/mattermost/mattermost-app-servicenow/commit/%s)",
+					BuildDate, BuildHashShort, BuildHash)
 			}
 			if a.mode != "" {
 				message += ", running as " + a.mode
