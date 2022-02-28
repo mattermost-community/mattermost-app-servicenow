@@ -38,6 +38,5 @@ func (p *Plugin) OnActivate() error {
 }
 
 func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Request) {
-	p.API.LogDebug("HTTP", "method", r.Method, "url", r.URL.Path)
 	p.router.ServeHTTP(w, r)
 }
