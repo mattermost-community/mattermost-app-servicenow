@@ -6,7 +6,7 @@ orbs:
 jobs:
   build-aws-lambda:
     executor:
-      name: default
+      name: plugin-ci/default
     steps:
       - checkout
       - run:
