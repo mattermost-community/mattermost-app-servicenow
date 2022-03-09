@@ -1,65 +1,23 @@
 version: 2.1
 
 orbs:
-  tools: gotest/tools@0.0.13
-
-executors:
-  default:
-    docker:
-      - image: circleci/golang:1.16
-
-aliases:
-- &restore_cache
-  restore_cache:
-    key: go-mod-v1-{{ checksum "go.sum" }}
-- &save_cache
-  save_cache:
-    key: go-mod-v1-{{ checksum "go.sum" }}
-    paths:
-    - "/go/pkg/mod"
+  plugin-ci: mattermost/plugin-ci@volatile
 
 jobs:
-  lint:
-    executor:
-      name: default
-    steps:
-      - checkout
-      - tools/install-golangci-lint:
-          version: 1.33.2
-      - *restore_cache
-      - run:
-          name: Running linter check
-          command: make lint
-      - run: go mod tidy -v
-      - run:
-          name: Check git diff
-          command: |
-            git --no-pager diff --exit-code go.mod go.sum || (echo "Please run \"go mod tidy\" and commit the changes in go.mod and go.sum." && exit 1)
-      - *save_cache
-
-  test:
-    executor:
-      name: default
-    steps:
-      - checkout
-      - *restore_cache
-      - run: make test
-      - *save_cache
-
-  build:
+  build-aws-lambda:
     executor:
       name: default
     steps:
       - checkout
       - run:
-          name: Building Apps bundle
-          command: make dist
+          name: Building App bundle for Mattermost Cloud
+          command: make dist-cloud dist-aws
       - persist_to_workspace:
           root: dist
           paths:
-            - "bundle.zip"
+            - "*.zip"
       - store_artifacts:
-          path: dist/bundle.zip
+          path: dist
 
 workflows:
   version: 2
@@ -72,11 +30,56 @@ workflows:
               only:
                 - master
     jobs:
-      - lint
-      - test
-      - build
+      - plugin-ci/lint
+      - plugin-ci/test
+      - plugin-ci/build
+      - build-aws-lambda
+
   ci:
     jobs:
-      - lint
-      - test
-      - build
+      - build-aws-lambda:
+          filters:
+            tags:
+              only: /^v.*/
+      - plugin-ci/lint:
+          filters:
+            tags:
+              only: /^v.*/
+      - plugin-ci/test:
+          filters:
+            tags:
+              only: /^v.*/
+      - plugin-ci/coverage:
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - plugin-ci/test
+      - plugin-ci/build:
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - plugin-ci/test
+      - plugin-ci/deploy-ci:
+          filters:
+            branches:
+              only: master
+          context: plugin-ci
+          requires:
+            - plugin-ci/lint
+            - plugin-ci/coverage
+            - plugin-ci/build
+            - plugin-ci/test
+      - plugin-ci/deploy-release-github:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          context: matterbuild-github-token
+          requires:
+            - plugin-ci/lint
+            - plugin-ci/coverage
+            - plugin-ci/build
+            - plugin-ci/test

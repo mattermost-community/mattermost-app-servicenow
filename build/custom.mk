@@ -11,7 +11,7 @@ GO_BUILD_FLAGS += -ldflags '$(LDFLAGS)'
 GO_TEST_FLAGS += -ldflags '$(LDFLAGS)'
 
 AWS_BUNDLE_NAME ?= $(PLUGIN_ID)-$(PLUGIN_VERSION)-aws.zip
-CLOUD_BUNDLE_NAME ?= $(PLUGIN_ID)-$(PLUGIN_VERSION)-cloud.zip
+CLOUD_BUNDLE_NAME ?= bundle.zip
 
 ## run: runs the app locally
 .PHONY: run
