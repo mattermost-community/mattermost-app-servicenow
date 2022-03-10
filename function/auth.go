@@ -12,7 +12,7 @@ import (
 func oauth2Config(creq goapp.CallRequest) (*oauth2.Config, error) {
 	cc := creq.Context
 	if cc.OAuth2.ClientID == "" || cc.OAuth2.RemoteURL == "" {
-		return nil, errors.New("oauth2 is not configured. Please have a system administrator use `/servicenow configure` command.")
+		return nil, errors.New("oauth2 is not configured. Please have a system administrator use `/servicenow configure` command")
 	}
 	return &oauth2.Config{
 		ClientID:     cc.OAuth2.ClientID,

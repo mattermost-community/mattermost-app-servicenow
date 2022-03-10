@@ -32,30 +32,35 @@ func RemoveTable(creq goapp.CallRequest, id string) error {
 }
 
 func GetTables(creq goapp.CallRequest) Tables {
-	return Tables{
-		"incident": Table{
-			ID:          "incident",
-			DisplayName: "Incidents",
-			Fields: []*apps.Field{
-				{
-					Name:        "short_description",
-					ModalLabel:  "Short Description",
-					Label:       "short_description",
-					Type:        apps.FieldTypeText,
-					TextSubtype: apps.TextFieldSubtypeTextarea,
-				},
-				{
-					Name:        "description",
-					Label:       "description",
-					ModalLabel:  "Long Description",
-					Type:        apps.FieldTypeText,
-					TextSubtype: apps.TextFieldSubtypeTextarea,
-				},
-			},
-			BindTo:        []apps.Location{apps.LocationCommand, apps.LocationChannelHeader, apps.LocationPostMenu},
-			PostFieldName: "short_description",
-		},
+	out := Tables{}
+	for k, v := range getAppConfig(creq).Tables {
+		out[k] = v
 	}
+
+	out["incident"] = Table{
+		ID:          "incident",
+		DisplayName: "Incidents",
+		Fields: []*apps.Field{
+			{
+				Name:        "short_description",
+				ModalLabel:  "Short Description",
+				Label:       "short_description",
+				Type:        apps.FieldTypeText,
+				TextSubtype: apps.TextFieldSubtypeTextarea,
+			},
+			{
+				Name:        "description",
+				Label:       "description",
+				ModalLabel:  "Long Description",
+				Type:        apps.FieldTypeText,
+				TextSubtype: apps.TextFieldSubtypeTextarea,
+			},
+		},
+		BindTo:        []apps.Location{apps.LocationCommand, apps.LocationChannelHeader, apps.LocationPostMenu},
+		PostFieldName: "short_description",
+	}
+
+	return out
 }
 
 func (t Tables) forLocation(root apps.Location) Tables {

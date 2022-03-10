@@ -47,17 +47,6 @@ func (a App) WithIcon(iconPath string) *App {
 	return &a
 }
 
-func AppendBindings(bb1, bb2 []apps.Binding) []apps.Binding {
-	var out []apps.Binding
-	if len(bb1) != 0 {
-		out = append(out, bb1...)
-	}
-	if len(bb2) != 0 {
-		out = append(out, bb2...)
-	}
-	return out
-}
-
 func AppendBinding(bb []apps.Binding, b *apps.Binding) []apps.Binding {
 	var out []apps.Binding
 	out = append(out, bb...)

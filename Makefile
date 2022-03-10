@@ -33,7 +33,7 @@ endif
 
 ## Checks the code style, tests, builds and bundles the plugin.
 .PHONY: all
-all: check-style test dist
+all: check-style test dist dist-aws dist-cloud
 
 ## Runs eslint and golangci-lint
 .PHONY: check-style

@@ -85,7 +85,7 @@ func RequireConnectedUser(h HandlerFunc) HandlerFunc {
 	}
 }
 
-func (creq CallRequest) appProxyURL(paths ...string) string {
+func (creq CallRequest) AppProxyURL(paths ...string) string {
 	p := path.Join(append([]string{creq.Context.AppPath}, paths...)...)
 	return creq.Context.MattermostSiteURL + p
 }

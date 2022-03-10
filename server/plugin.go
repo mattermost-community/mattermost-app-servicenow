@@ -21,7 +21,7 @@ type Plugin struct {
 	log    utils.Logger
 }
 
-func (p *Plugin) OnActivate() error {
+func (p *Plugin) OnActivate() (_ error) {
 	p.router = mux.NewRouter()
 	p.client = pluginapi.NewClient(p.API, p.Driver)
 	p.log = utils.NewPluginLogger(p.client)
@@ -34,9 +34,10 @@ func (p *Plugin) OnActivate() error {
 	functionRouter := mux.NewRouter()
 	function.Init("plugin", functionRouter, p.log)
 	p.router.PathPrefix(apps.PluginAppPath).Handler(http.StripPrefix(apps.PluginAppPath, functionRouter))
+
 	return nil
 }
 
-func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Request) {
+func (p *Plugin) ServeHTTP(_ *plugin.Context, w http.ResponseWriter, r *http.Request) {
 	p.router.ServeHTTP(w, r)
 }

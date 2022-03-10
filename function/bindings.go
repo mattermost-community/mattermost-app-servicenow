@@ -16,9 +16,9 @@ func (a *App) getBindings(creq goapp.CallRequest) apps.CallResponse {
 				Description: "Create incidents in your ServiceNow instance",
 				Icon:        root.AppManifest.Icon,
 
-				Bindings: goapp.AppendBindings(
+				Bindings: append(
 					a.commandBindings(creq),
-					a.debugCommandBindings(creq),
+					a.debugCommandBindings(creq)...,
 				),
 			},
 		},
@@ -88,7 +88,7 @@ func (a *App) debugCommandBindings(creq goapp.CallRequest) []apps.Binding {
 		return nil
 	}
 
-	return nil
+	return []apps.Binding{}
 	// return []apps.Binding{
 	// 	{
 	// 		Label:    "debug",
