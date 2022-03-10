@@ -12,10 +12,10 @@ jobs:
       - restore_cache:
           key: 'go-mod-v1-{{ checksum "go.sum" }}'
       - run:
-          name: Building Plugin Bundle
+          name: Building App bundled as plugin
           command: make dist
       - run:
-          name: Building App bundle for Mattermost Cloud
+          name: Building App bundled as AWS and Mattermost Cloud (bundle.zip)
           command: make dist-cloud dist-aws
       - run:
           name: Generating Release Notes
