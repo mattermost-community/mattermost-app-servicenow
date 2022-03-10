@@ -10,11 +10,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Building App bundle for Mattermost Cloud
-          command: make dist-cloud dist-aws
-      - run:
           name: Building Plugin Bundle
           command: make dist
+      - run:
+          name: Building App bundle for Mattermost Cloud
+          command: make dist-cloud dist-aws
       - run:
           name: Generating Release Notes
           command: >
