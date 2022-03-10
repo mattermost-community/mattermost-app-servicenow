@@ -49,8 +49,7 @@ workflows:
     jobs:
       - plugin-ci/lint
       - plugin-ci/test
-      - plugin-ci/build
-      - build-aws-lambda
+      - build
 
   ci:
     jobs:
