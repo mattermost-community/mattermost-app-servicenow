@@ -4,7 +4,7 @@ orbs:
   plugin-ci: mattermost/plugin-ci@volatile
 
 jobs:
-  build-aws-lambda:
+  build:
     executor:
       name: plugin-ci/default
     steps:
@@ -12,10 +12,27 @@ jobs:
       - run:
           name: Building App bundle for Mattermost Cloud
           command: make dist-cloud dist-aws
+      - run:
+          name: Building Plugin Bundle
+          command: make dist
+      - run:
+          name: Generating Release Notes
+          command: >
+            printf "Supported Mattermost Server Versions: **$(cat plugin.json | jq
+            .min_server_version -r)+** \n## Enhancements\n\n## Fixes\n"  >>
+            dist/release-notes.md
+
+            if [[ $(git tag -l | wc -l) -eq 1 ]]; then
+              git log --pretty='format:- %h %s' --abbrev-commit --no-decorate --no-color $(git rev-list --max-parents=0 HEAD) HEAD >> dist/release-notes.md
+            else
+              git log --pretty='format:- %h %s' --abbrev-commit --no-decorate --no-color $(git describe --tags --abbrev=0 $(git describe --tags --abbrev=0)^)..HEAD >> dist/release-notes.md
+            fi
       - persist_to_workspace:
           root: dist
           paths:
             - "*.zip"
+            - '*.tar.gz'
+            - release-notes.md
       - store_artifacts:
           path: dist
 
@@ -37,7 +54,7 @@ workflows:
 
   ci:
     jobs:
-      - build-aws-lambda:
+      - build:
           filters:
             tags:
               only: /^v.*/
@@ -57,13 +74,6 @@ workflows:
               only: /^v.*/
           requires:
             - plugin-ci/test
-      - plugin-ci/build:
-          filters:
-            tags:
-              only: /^v.*/
-          requires:
-            - plugin-ci/test
-            - build-aws-lambda
       - plugin-ci/deploy-ci:
           filters:
             branches:
@@ -72,7 +82,7 @@ workflows:
           requires:
             - plugin-ci/lint
             - plugin-ci/coverage
-            - plugin-ci/build
+            - build
             - plugin-ci/test
       - plugin-ci/deploy-release-github:
           filters:
@@ -84,5 +94,5 @@ workflows:
           requires:
             - plugin-ci/lint
             - plugin-ci/coverage
-            - plugin-ci/build
+            - build
             - plugin-ci/test
