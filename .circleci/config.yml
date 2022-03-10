@@ -37,12 +37,12 @@ workflows:
 
   ci:
     jobs:
-      - build-aws-lambda:
-          filters:
-            tags:
-              only: /^v.*/
-          requires:
-            - plugin-ci/test
+      # - build-aws-lambda:
+      #     filters:
+      #       tags:
+      #         only: /^v.*/
+      #     requires:
+      #       - plugin-ci/test
       - plugin-ci/lint:
           filters:
             tags:
@@ -51,37 +51,38 @@ workflows:
           filters:
             tags:
               only: /^v.*/
-      # - plugin-ci/coverage:
-      #     filters:
-      #       tags:
-      #         only: /^v.*/
-      #     requires:
-      #       - plugin-ci/test
-      # - plugin-ci/build:
-      #     filters:
-      #       tags:
-      #         only: /^v.*/
-      #     requires:
-      #       - plugin-ci/test
-      # - plugin-ci/deploy-ci:
-      #     filters:
-      #       branches:
-      #         only: master
-      #     context: plugin-ci
-      #     requires:
-      #       - plugin-ci/lint
-      #       - plugin-ci/coverage
-      #       - plugin-ci/build
-      #       - plugin-ci/test
-      # - plugin-ci/deploy-release-github:
-      #     filters:
-      #       tags:
-      #         only: /^v.*/
-      #       branches:
-      #         ignore: /.*/
-      #     context: matterbuild-github-token
-      #     requires:
-      #       - plugin-ci/lint
-      #       - plugin-ci/coverage
-      #       - plugin-ci/build
-      #       - plugin-ci/test
+      - plugin-ci/coverage:
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - plugin-ci/test
+      - plugin-ci/build:
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - plugin-ci/test
+            - build-aws-lambda
+      - plugin-ci/deploy-ci:
+          filters:
+            branches:
+              only: master
+          context: plugin-ci
+          requires:
+            - plugin-ci/lint
+            - plugin-ci/coverage
+            - plugin-ci/build
+            - plugin-ci/test
+      - plugin-ci/deploy-release-github:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          context: matterbuild-github-token
+          requires:
+            - plugin-ci/lint
+            - plugin-ci/coverage
+            - plugin-ci/build
+            - plugin-ci/test
