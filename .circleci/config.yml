@@ -37,12 +37,12 @@ workflows:
 
   ci:
     jobs:
-      # - build-aws-lambda:
-      #     filters:
-      #       tags:
-      #         only: /^v.*/
-      #     requires:
-      #       - plugin-ci/test
+      - build-aws-lambda:
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - plugin-ci/test
       - plugin-ci/lint:
           filters:
             tags:
