@@ -55,9 +55,9 @@ var configureCommand = goapp.Command{
 
 		asActingUser := appclient.AsActingUser(creq.Context)
 		app := apps.OAuth2App{
-			RemoteRootURL:    serviceNowURL,
-			ClientID:     clientID,
-			ClientSecret: clientSecret,
+			RemoteRootURL: serviceNowURL,
+			ClientID:      clientID,
+			ClientSecret:  clientSecret,
 		}
 		err := asActingUser.StoreOAuth2App(creq.Context.AppID, app)
 		if err != nil {
