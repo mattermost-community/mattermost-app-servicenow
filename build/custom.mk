@@ -40,7 +40,7 @@ deploy-aws: dist-aws
 .PHONY: dist-cloud
 dist-cloud:
 	rm -rf dist/cloud && mkdir -p dist/cloud
-	cd cloud ; \
+	cd aws ; \
 		CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(GO_BUILD_FLAGS) -o ../dist/cloud/servicenow .
 	cp manifest-v0.7.0.json dist/cloud/manifest.json
 	cp -r static dist/cloud
