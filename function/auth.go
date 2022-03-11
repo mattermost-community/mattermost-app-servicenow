@@ -11,7 +11,7 @@ import (
 
 func oauth2Config(creq goapp.CallRequest) (*oauth2.Config, error) {
 	cc := creq.Context
-	if cc.OAuth2.ClientID == "" || cc.OAuth2.RemoteURL == "" {
+	if cc.OAuth2.ClientID == "" || cc.OAuth2.RemoteRootURL == "" {
 		return nil, errors.New("oauth2 is not configured. Please have a system administrator use `/servicenow configure` command")
 	}
 	return &oauth2.Config{
@@ -19,8 +19,8 @@ func oauth2Config(creq goapp.CallRequest) (*oauth2.Config, error) {
 		ClientSecret: cc.OAuth2.ClientSecret,
 		RedirectURL:  cc.OAuth2.CompleteURL,
 		Endpoint: oauth2.Endpoint{
-			AuthURL:  cc.OAuth2.RemoteURL + "/oauth_auth.do",
-			TokenURL: cc.OAuth2.RemoteURL + "/oauth_token.do",
+			AuthURL:  cc.OAuth2.RemoteRootURL + "/oauth_auth.do",
+			TokenURL: cc.OAuth2.RemoteRootURL + "/oauth_token.do",
 		},
 	}, nil
 }
@@ -32,7 +32,9 @@ func (a *App) oauth2Connect(creq goapp.CallRequest) apps.CallResponse {
 		return apps.NewErrorResponse(err)
 	}
 
-	return apps.NewDataResponse(c.AuthCodeURL(state, oauth2.AccessTypeOffline))
+	u := c.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	creq.App.Logger.Debugf("generated OAuth2 redirect URL: %s", u)
+	return apps.NewDataResponse(u)
 }
 
 func (a *App) oauth2Complete(creq goapp.CallRequest) apps.CallResponse {
@@ -55,5 +57,7 @@ func (a *App) oauth2Complete(creq goapp.CallRequest) apps.CallResponse {
 		return apps.NewErrorResponse(errors.Wrap(err, "failed to store OAuth user info to Mattermost"))
 	}
 
-	return apps.NewTextResponse("completed connecting to ServiceNow with OAuth2.")
+	message := "completed connecting to ServiceNow with OAuth2."
+	goapp.OAuth2Logger(creq.App.Logger, nil, &user).Debugw(message)
+	return apps.NewTextResponse(message)
 }

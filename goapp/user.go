@@ -51,3 +51,25 @@ func (a *App) StoreConnectedUser(creq CallRequest, user *User) error {
 	creq.App.Logger.Debugw("Updated user record", "id", user.MattermostID, "access_token", accessTokenLog, "expires", expires, "refresh_token", refreshTokenLog)
 	return nil
 }
+
+func OAuth2Logger(l utils.Logger, a *apps.OAuth2App, u *User) utils.Logger {
+	if a != nil {
+		l = l.With(
+			"remote_url", a.RemoteRootURL,
+			"client_id", a.ClientID,
+			"client_secret", utils.LastN(a.ClientSecret, 4),
+		)
+		if a.Data != nil {
+			l = l.With("app_data", a.Data)
+		}
+	}
+	if u != nil {
+		l = l.With(
+			"user_id", u.MattermostID,
+			"access_token", utils.LastN(u.Token.AccessToken, 4),
+			"refresh_token", utils.LastN(u.Token.RefreshToken, 4),
+			"token_expiry", u.Token.Expiry.String(),
+		)
+	}
+	return l
+}

@@ -41,6 +41,7 @@ func FormHandler(h func(CallRequest) (apps.Form, error)) HandlerFunc {
 	return func(creq CallRequest) apps.CallResponse {
 		f, err := h(creq)
 		if err != nil {
+			creq.App.Logger.WithError(err).Infow("failed to respond with form")
 			return apps.NewErrorResponse(err)
 		}
 		return apps.NewFormResponse(f)
@@ -58,6 +59,7 @@ func CallHandler(h func(CallRequest) (string, error)) HandlerFunc {
 	return func(creq CallRequest) apps.CallResponse {
 		text, err := h(creq)
 		if err != nil {
+			creq.App.Logger.WithError(err).Infow("failed to process call")
 			return apps.NewErrorResponse(err)
 		}
 		return apps.NewTextResponse(text)

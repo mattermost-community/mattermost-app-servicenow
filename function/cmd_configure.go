@@ -54,17 +54,19 @@ var configureCommand = goapp.Command{
 		serviceNowURL := creq.GetValue(fURL, "")
 
 		asActingUser := appclient.AsActingUser(creq.Context)
-		err := asActingUser.StoreOAuth2App(creq.Context.AppID, apps.OAuth2App{
-			RemoteURL:    serviceNowURL,
+		app := apps.OAuth2App{
+			RemoteRootURL:    serviceNowURL,
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
-		})
+		}
+		err := asActingUser.StoreOAuth2App(creq.Context.AppID, app)
 		if err != nil {
 			return apps.NewErrorResponse(errors.Wrap(err, "failed to store Oauth2 configuration to Mattermost"))
 		}
 
+		goapp.OAuth2Logger(creq.App.Logger, &app, nil).Debugf("updated OAuth2 app credentials")
 		return apps.NewTextResponse(
-			"updated OAuth client credentials:\n"+
+			"updated OAuth2 app credentials:\n"+
 				"  - ServiceNow URL: `%s`\n"+
 				"  - Client ID, ending in `%s`\n"+
 				"  - Client Secret, ending in `%s`\n",

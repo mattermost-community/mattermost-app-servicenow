@@ -97,5 +97,5 @@ func (a *App) CreateIncident(c *Client, creq goapp.CallRequest, table string, v 
 }
 
 func apiURL(creq goapp.CallRequest, apiPath string) string {
-	return creq.Context.OAuth2.RemoteURL + apiPath
+	return creq.Context.OAuth2.RemoteRootURL + apiPath
 }

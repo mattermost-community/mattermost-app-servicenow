@@ -2,8 +2,10 @@ package function
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/mattermost/mattermost-plugin-apps/apps"
+	"github.com/mattermost/mattermost-plugin-apps/utils"
 
 	"github.com/mattermost/mattermost-app-servicenow/goapp"
 )
@@ -22,32 +24,43 @@ func (a *App) infoCommand() goapp.Command {
 		},
 
 		Handler: func(creq goapp.CallRequest) apps.CallResponse {
-			message := "ServiceNow App"
+			title := "ServiceNow App"
 			if BuildDate != "" {
-				message += fmt.Sprintf(" built: %s from [%s](https://github.com/mattermost/mattermost-app-servicenow/commit/%s)",
+				title += fmt.Sprintf(" built: %s from [%s](https://github.com/mattermost/mattermost-app-servicenow/commit/%s)",
 					BuildDate, BuildHashShort, BuildHash)
 			}
 			if a.mode != "" {
-				message += ", running as " + a.mode
+				title += ", running as " + a.mode
 			}
-			message += "\n\n"
-			message += fmt.Sprintf("☑ OAuth2 complete URL: `%s`\n", creq.Context.OAuth2.CompleteURL)
+			title += "\n"
+
+			oauth2CallbackMessage := fmt.Sprintf("☑ OAuth2 callback URL: `%s`\n", creq.Context.OAuth2.CompleteURL)
 
 			connectLink := ""
+			oauth2AppMessage := "☐ OAuth2 App: not configured. Please use `/servicenow configure`.\n"
 			if creq.Context.OAuth2.ClientID != "" {
-				message += "☑ OAuth2 App: configured.\n"
+				oauth2AppMessage = fmt.Sprintf("☑ OAuth2 App: `%s`, Client ID `%s`, Secret `%s`\n",
+					creq.Context.OAuth2.RemoteRootURL,
+					utils.LastN(creq.Context.OAuth2.ClientID, 8),
+					utils.LastN(creq.Context.OAuth2.ClientSecret, 4))
 				connectLink = fmt.Sprintf(" Click [here](%s) to connect.\n", creq.Context.OAuth2.ConnectURL)
-			} else {
-				message += "☐ OAuth2 App: not configured. Please use `/servicenow configure`.\n"
 			}
 
+			connectMessage := fmt.Sprintf("☐ Not connected to ServiceNow.%s\n", connectLink)
 			if u := creq.OAuth2User(); u != nil {
-				message += fmt.Sprintf("☑ Connected to ServiceNow as %s.\n", u.RemoteID)
-			} else {
-				message += fmt.Sprintf("☐ Not connected to ServiceNow.%s\n", connectLink)
+				remote := u.RemoteID
+				if remote == "" {
+					remote = "_unknown_"
+				}
+				connectMessage = fmt.Sprintf("☑ Connected to ServiceNow as %s.\n", remote)
 			}
 
-			return apps.NewTextResponse(message)
+			return apps.NewTextResponse(strings.Join([]string{
+				title, "\n",
+				oauth2CallbackMessage,
+				oauth2AppMessage,
+				connectMessage,
+			}, "\n"))
 		},
 	}
 }

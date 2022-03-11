@@ -7,7 +7,7 @@ require (
 	github.com/awslabs/aws-lambda-go-api-proxy v0.12.0
 	github.com/gorilla/mux v1.8.0
 	github.com/mattermost/mattermost-plugin-api v0.0.21
-	github.com/mattermost/mattermost-plugin-apps v0.7.1-0.20220228163956-2de9c5ba2374
+	github.com/mattermost/mattermost-plugin-apps v0.7.1-0.20220301195508-63e0ed116384
 	github.com/mattermost/mattermost-server/v6 v6.0.0-20210901153517-42e75fad4dae
 	github.com/pkg/errors v0.9.1
 	go.uber.org/zap v1.17.0
