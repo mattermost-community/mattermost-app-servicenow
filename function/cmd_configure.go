@@ -59,7 +59,7 @@ var configureCommand = goapp.Command{
 			ClientID:      clientID,
 			ClientSecret:  clientSecret,
 		}
-		err := asActingUser.StoreOAuth2App(creq.Context.AppID, app)
+		err := asActingUser.StoreOAuth2App(app)
 		if err != nil {
 			return apps.NewErrorResponse(errors.Wrap(err, "failed to store Oauth2 configuration to Mattermost"))
 		}

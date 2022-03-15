@@ -51,7 +51,7 @@ func (a *App) oauth2Complete(creq goapp.CallRequest) apps.CallResponse {
 
 	user := goapp.User{
 		Token:        token,
-		MattermostID: creq.Context.ActingUserID,
+		MattermostID: creq.Context.ActingUser.Id,
 	}
 	if err = a.StoreConnectedUser(creq, &user); err != nil {
 		return apps.NewErrorResponse(errors.Wrap(err, "failed to store OAuth user info to Mattermost"))

@@ -40,7 +40,7 @@ func DisconnectCommand(name string) Command {
 
 		Handler: func(creq CallRequest) apps.CallResponse {
 			asActingUser := appclient.AsActingUser(creq.Context)
-			err := asActingUser.StoreOAuth2User(creq.Context.AppID, nil)
+			err := asActingUser.StoreOAuth2User(nil)
 			if err != nil {
 				return apps.NewErrorResponse(errors.Wrap(err, "failed to reset the stored user"))
 			}
