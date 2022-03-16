@@ -27,7 +27,7 @@ func (a *App) createTicketHandler(creq goapp.CallRequest) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to create ticket")
 	}
-	creq.App.Logger.Debugw("Created ticket", "user_id", creq.Context.ActingUserID, "id", id, "table", tableID)
+	creq.App.Logger.Debugw("Created ticket", "user_id", creq.Context.ActingUser.Id, "id", id, "table", tableID)
 	navToURI := fmt.Sprintf("/%s?sys_id=%s", url.PathEscape(tableID), url.QueryEscape(id))
 	ticketLink := fmt.Sprintf("%s/nav_to.do?uri=%s", creq.Context.OAuth2.RemoteRootURL, navToURI)
 	return fmt.Sprintf("Ticket created [here](%s).", ticketLink), nil

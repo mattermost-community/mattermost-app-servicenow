@@ -19,12 +19,12 @@ type User struct {
 
 func (a *App) RemoveConnectedUser(creq CallRequest) error {
 	asActingUser := appclient.AsActingUser(creq.Context)
-	err := asActingUser.StoreOAuth2User(creq.Context.AppID, nil)
+	err := asActingUser.StoreOAuth2User(nil)
 	if err != nil {
 		return apps.NewErrorResponse(errors.Wrap(err, "failed to removed the user record"))
 	}
 
-	creq.App.Logger.Debugw("Removed user record", "id", creq.Context.ActingUserID)
+	creq.App.Logger.Debugw("Removed user record", "id", creq.Context.ActingUser.Id)
 	return nil
 }
 
@@ -34,8 +34,8 @@ func (a *App) StoreConnectedUser(creq CallRequest, user *User) error {
 	}
 
 	asActingUser := appclient.AsActingUser(creq.Context)
-	user.MattermostID = creq.Context.ActingUserID
-	err := asActingUser.StoreOAuth2User(creq.Context.AppID, user)
+	user.MattermostID = creq.Context.ActingUser.Id
+	err := asActingUser.StoreOAuth2User(user)
 	if err != nil {
 		return apps.NewErrorResponse(errors.Wrap(err, "failed to store the user record"))
 	}
