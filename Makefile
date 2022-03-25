@@ -129,8 +129,12 @@ endif
 	@echo plugin built at: dist/$(BUNDLE_NAME)
 
 ## Builds and bundles the plugin.
+.PHONY: dist-plugin
+dist-plugin:	server webapp bundle
+
+## Builds and bundles the plugin, Mattermost cloud, and AWS Lambda.
 .PHONY: dist
-dist:	server webapp bundle
+dist:	dist-plugin dist-cloud dist-aws
 
 ## Builds and installs the plugin to a server.
 .PHONY: deploy
