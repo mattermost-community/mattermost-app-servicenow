@@ -25,9 +25,6 @@
             }
         ]
     },
-    "http": {
-        "root_url": "http://localhost:4445"
-    },
     "plugin": {
         "plugin_id": "com.mattermost.app.servicenow"
     },
