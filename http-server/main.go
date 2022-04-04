@@ -2,12 +2,12 @@ package main
 
 import (
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/mattermost/mattermost-plugin-apps/apps"
 	"github.com/mattermost/mattermost-plugin-apps/utils"
 
 	root "github.com/mattermost/mattermost-app-servicenow"
@@ -15,17 +15,21 @@ import (
 )
 
 func main() {
-	portStr := os.Getenv("PORT")
-	if portStr == "" {
-		portStr = "4445"
+	rootURL := os.Getenv("ROOT_URL")
+	if rootURL != "" {
+		root.AppManifest.Deploy.HTTP.RootURL = rootURL
 	}
 
-	rootURL := os.Getenv("ROOT_URL")
-	if rootURL == "" {
-		rootURL = "http://localhost:" + portStr
-	}
-	root.AppManifest.Deploy.HTTP = &apps.HTTP{
-		RootURL: rootURL,
+	portStr := os.Getenv("PORT")
+	if portStr == "" {
+		u, err := url.Parse(rootURL)
+		if err != nil {
+			panic(err)
+		}
+		portStr = u.Port()
+		if portStr == "" {
+			portStr = "8080"
+		}
 	}
 
 	r := mux.NewRouter()
