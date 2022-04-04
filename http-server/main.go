@@ -22,7 +22,7 @@ func main() {
 
 	portStr := os.Getenv("PORT")
 	if portStr == "" {
-		u, err := url.Parse(rootURL)
+		u, err := url.Parse(root.AppManifest.Deploy.HTTP.RootURL)
 		if err != nil {
 			panic(err)
 		}
