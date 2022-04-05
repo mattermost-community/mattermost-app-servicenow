@@ -1,56 +1,59 @@
 # ServiceNow App Technical Documentation
 
-## Main functionality
+### Functionality
 
-- OAuth connection with one ServiceNow instance.
-- Creation of tickets on a predefined table (incidents).
+- (admin) Configure OAuth2 app on a ServiceNow instance.
+- Connect/disconnect user accounts with OAuth2.
+- Create entries in the `incident` table; blank, or from a post in Mattermost
+  Channels.
 
-## Code overview
+### Overview
 
-- App package:
-  - Contains the business logic of the app. Handles OAuth information, transformation between tables and bindings, and checks on user connection.
-- Clients package:
-  - Contains the external clients used by the app. Right now only the ServiceNow client.
-  - It also defines the models used by the client (e.g. Ticket model on ServiceNow side).
-- Config package:
-  - Handles the configuration and its storage. Mainly covers ServiceNow instance and tables (stored in the KV store) and the OAuth config (stored in the OAuth system).
-- Constants package:
-  - Stores all the constant values used by the app.
-- Routers package:
-  - Contains all the routers that accept external input. Right now only covers Mattermost (AWS apps should only receive information from Mattermost).
-  - It creates the router and handles all calls, including bindings.
-- Utils package:
-  - Several util functions, mainly covering HTTP responses writing, path handling for bindings, and others.
+- `./aws` contains the `main` used to bundle for AWS (Lambda+S3). The AWS bundle
+  can be made with `make dist-aws`.
+- `./build` is part of a Mattermost plugin bolierplate, with a `custom.mk` that
+  builds other app bundles. 
+- `./docs` contains documentation (this!)
+- `./function` contains the business logic of the app, that does not depend on the
+  packaging. It is essentially the app; the name `function` is used for OpenFaas
+  template compatibility.
+- `./goapp` contains an experimental utility framework for building simple
+  Mattermost apps in Go. It shall be moved to the main apps reporitory soon.
+- `./http-server` contains the `main` to run as an HTTP server. It can be executed
+  as `[PORT=port_number] [ROOT_URL=root_http(s)_url] make run`.
+- `./server` contains the `main` used to bundle as a Mattermost plugin. The plugin
+  bundle can be made with `make dist`.
+- `./static` contains the app's icon.
+- `root.go` contains preloaded root-level data: manifest(s) and ./static files.
 
-## Behavior
+### Development Environment
 
-When the app is initially installed, all users receive the command binding `connect`. The System Admin receives an additional command binding: `onfig OAuth`. Through `config OAuth` we will be able to add the needed information to perform the OAuth connection with ServiceNow: the link to the instance, the client ID, and the client secret.
 
-The OAuth configuration is stored in two different places:
-- The client ID and Secret is stored through the Mattermost OAuth API. 
-- The link to the instance is stored in the KV store along with the configuration.
+The recommended development environment is a local Mattermost server, and the
+2. Set up your instance to use the apps framework debug commands:
+  - Go to **System Console > Environment > Developer**.
+  - Set **Enable Testing Commands** to **true**.
+  - Set **Enable Developer Mode** to **true**.
+  - Select **Save**.
 
-The connect command generates an ephemeral message with the link to start the OAuth process through Mattermost.
 
-The connect call will:
-- Create the OAuth configuration using the information in the context.
-- Fetch the state from the call values and fail in case it doesn't exist.
-- Return the `AuthCodeURL` to Mattermost.
 
-The complete call will:
-- Get the code from the call values.
-- Create the OAuth configuration using the information in the context.
-- Generate the token out of the code and the OAuth configuration.
-- Store the token directly as the OAuth user information service provided by Mattermost.
+#### HTTP mode (recommended)
 
-Any check on whether the user is connected or not will be made checking whether the OAth user information exists in the call context. Connected users will no longer see the connect command. They will have a `disconnect` command, and bindings on post, channel header, and command for creating tickets.
+The recommended development environment is a local Mattermost server, and the
+App running in the HTTP mode, also locally.
 
-When a user disconnects, the call sets the OAuth user information to `nil`.
+To run the app, use `[PORT=port_number] [ROOT_URL=root_http(s)_url] make run`
+command.
 
-All `create ticket` bindings will open a modal dialog. The channel header binding will open an empty modal, post menu binding will open a modal with “short description” set to the post content, and command binding will pre-populate all fields with the values we set on the command.
+Upon startup, the app will display the URL of the manifest, to use with the
+`/apps install http` command in Mattermost.
 
-When you submit the modal, the ticket will be created on the `incident` table on ServiceNow. If any error occurs, it will display in the modal.
+#### Mattermost plugin mode
 
-All forms for commands are created on binding request to keep the communication to the app at minimum.
+You can also develop with the app running as a plugin. Use `make dist-plugin` to
+build, and `appsctl plugin deploy --install` to (re-)install the App to the
+Mattermost server.
 
-Create ticket bindings are prepared to allow several tables. This has not been tested since we need a proper way to add more tables to the config and submenus on channel header and post menu.
+For quick iterations when re-installing the app is not required, use `make
+deploy`.

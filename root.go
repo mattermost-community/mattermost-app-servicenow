@@ -9,13 +9,13 @@ import (
 	"github.com/mattermost/mattermost-plugin-apps/apps"
 )
 
-// PluginManifestData is preloaded with the plugin manifest.
+// pluginManifestData is preloaded with the plugin manifest.
 //go:embed plugin.json
-var PluginManifestData []byte
+var pluginManifestData []byte
 
-// AppManifestData is preloaded with the Mattermost App manifest.
+// appManifestData is preloaded with the Mattermost App manifest.
 //go:embed manifest.json
-var AppManifestData []byte
+var appManifestData []byte
 
 // Static is preloaded with the contents of the ./static directory.
 //go:embed static
@@ -25,11 +25,11 @@ var Manifest model.Manifest
 var AppManifest apps.Manifest
 
 func init() {
-	err := json.Unmarshal(PluginManifestData, &Manifest)
+	err := json.Unmarshal(pluginManifestData, &Manifest)
 	if err != nil {
 		panic(err)
 	}
-	err = json.Unmarshal(AppManifestData, &AppManifest)
+	err = json.Unmarshal(appManifestData, &AppManifest)
 	if err != nil {
 		panic(err)
 	}
