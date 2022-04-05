@@ -38,6 +38,6 @@ func main() {
 	http.Handle("/", r)
 
 	listen := ":" + portStr
-	log.Infof("servicenow app started, listening on port %s, manifest at %s/manifest.json", portStr, rootURL)
+	log.Infof("servicenow app started, listening on port %s, manifest at %s/manifest.json", portStr, root.AppManifest.Deploy.HTTP.RootURL)
 	panic(http.ListenAndServe(listen, nil))
 }
