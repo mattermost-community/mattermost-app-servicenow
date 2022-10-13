@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap/zapcore"
@@ -35,9 +36,15 @@ func main() {
 	r := mux.NewRouter()
 	log := utils.MustMakeCommandLogger(zapcore.DebugLevel)
 	function.Init("http", r, log)
-	http.Handle("/", r)
 
 	listen := ":" + portStr
+	server := &http.Server{
+		Addr:              listen,
+		ReadHeaderTimeout: 3 * time.Second,
+		WriteTimeout:      5 * time.Second,
+		Handler:           r,
+	}
+
 	log.Infof("servicenow app started, listening on port %s, manifest at %s/manifest.json", portStr, root.AppManifest.Deploy.HTTP.RootURL)
-	panic(http.ListenAndServe(listen, nil))
+	panic(server.ListenAndServe())
 }
