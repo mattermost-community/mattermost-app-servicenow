@@ -10,14 +10,17 @@ import (
 )
 
 // pluginManifestData is preloaded with the plugin manifest.
+//
 //go:embed plugin.json
 var pluginManifestData []byte
 
 // appManifestData is preloaded with the Mattermost App manifest.
+//
 //go:embed manifest.json
 var appManifestData []byte
 
 // Static is preloaded with the contents of the ./static directory.
+//
 //go:embed static
 var Static embed.FS
 
