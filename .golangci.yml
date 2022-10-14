@@ -7,11 +7,11 @@ linters-settings:
     simplify: true
   goimports:
     local-prefixes: github.com/mattermost/mattermost-app-servicenow
-  golint:
-    min-confidence: 0
   govet:
     check-shadowing: true
     enable-all: true
+    disable:
+      - fieldalignment
   lll:
     line-length: 140
   misspell:
@@ -20,57 +20,29 @@ linters-settings:
 linters:
   disable-all: true
   enable:
-    - deadcode
+    - bodyclose
     - errcheck
+    - gocritic
+    - gofmt
+    - goimports
+    - gosec
     - gosimple
     - govet
     - ineffassign
-    - staticcheck
-    - structcheck
-    - typecheck
-    - unused
-    - varcheck
-    - asciicheck
-    - bodyclose
-    - depguard
-    - dogsled
-    - dupl
-    - gochecknoglobals
-    - gochecknoinits
-    - gocognit
-    - goconst
-    - gocritic
-    - gocyclo
-    - godot
-    - godox
-    - goerr113
-    - gofmt
-    - goimports
-    - golint
-    - gomnd
-    - gomodguard
-    - goprintffuncname
-    - gosec
-    - interfacer
-    - lll
-    - maligned
     - misspell
     - nakedret
-    - nestif
-    - nolintlint
-    - prealloc
-    - rowserrcheck
-    - scopelint
+    - revive
+    - staticcheck
     - stylecheck
-    - testpackage
+    - typecheck
     - unconvert
-    - unparam
+    - unused
     - whitespace
-    - wsl
 
 issues:
   exclude-rules:
     - path: _test\.go
       linters:
         - bodyclose
+        - goconst
         - scopelint # https://github.com/kyoh86/scopelint/issues/4

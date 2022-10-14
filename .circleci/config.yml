@@ -1,65 +1,40 @@
 version: 2.1
 
 orbs:
-  tools: gotest/tools@0.0.13
-
-executors:
-  default:
-    docker:
-      - image: circleci/golang:1.16
-
-aliases:
-- &restore_cache
-  restore_cache:
-    key: go-mod-v1-{{ checksum "go.sum" }}
-- &save_cache
-  save_cache:
-    key: go-mod-v1-{{ checksum "go.sum" }}
-    paths:
-    - "/go/pkg/mod"
+  plugin-ci: mattermost/plugin-ci@volatile
 
 jobs:
-  lint:
-    executor:
-      name: default
-    steps:
-      - checkout
-      - tools/install-golangci-lint:
-          version: 1.33.2
-      - *restore_cache
-      - run:
-          name: Running linter check
-          command: make lint
-      - run: go mod tidy -v
-      - run:
-          name: Check git diff
-          command: |
-            git --no-pager diff --exit-code go.mod go.sum || (echo "Please run \"go mod tidy\" and commit the changes in go.mod and go.sum." && exit 1)
-      - *save_cache
-
-  test:
-    executor:
-      name: default
-    steps:
-      - checkout
-      - *restore_cache
-      - run: make test
-      - *save_cache
-
   build:
     executor:
-      name: default
+      name: plugin-ci/default
     steps:
       - checkout
       - run:
-          name: Building Apps bundle
+          name: Building App bundled as plugin
           command: make dist
+      - run:
+          name: Building App bundled as AWS and Mattermost Cloud (bundle.zip)
+          command: make dist-cloud dist-aws
+      - run:
+          name: Generating Release Notes
+          command: >
+            printf "Supported Mattermost Server Versions: **$(cat plugin.json | jq
+            .min_server_version -r)+** \n## Enhancements\n\n## Fixes\n"  >>
+            dist/release-notes.md
+
+            if [[ $(git tag -l | wc -l) -eq 1 ]]; then
+              git log --pretty='format:- %h %s' --abbrev-commit --no-decorate --no-color $(git rev-list --max-parents=0 HEAD) HEAD >> dist/release-notes.md
+            else
+              git log --pretty='format:- %h %s' --abbrev-commit --no-decorate --no-color $(git describe --tags --abbrev=0 $(git describe --tags --abbrev=0)^)..HEAD >> dist/release-notes.md
+            fi
       - persist_to_workspace:
           root: dist
           paths:
-            - "bundle.zip"
+            - "*.zip"
+            - '*.tar.gz'
+            - release-notes.md
       - store_artifacts:
-          path: dist/bundle.zip
+          path: dist
 
 workflows:
   version: 2
@@ -72,11 +47,51 @@ workflows:
               only:
                 - master
     jobs:
-      - lint
-      - test
+      - plugin-ci/lint
+      - plugin-ci/test
       - build
+
   ci:
     jobs:
-      - lint
-      - test
-      - build
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - plugin-ci/test
+      - plugin-ci/lint:
+          filters:
+            tags:
+              only: /^v.*/
+      - plugin-ci/test:
+          filters:
+            tags:
+              only: /^v.*/
+      - plugin-ci/coverage:
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - plugin-ci/test
+      - plugin-ci/deploy-ci:
+          filters:
+            branches:
+              only: master
+          context: plugin-ci
+          requires:
+            - plugin-ci/lint
+            - plugin-ci/coverage
+            - build
+            - plugin-ci/test
+      - plugin-ci/deploy-release-github:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          context: matterbuild-github-token
+          requires:
+            - plugin-ci/lint
+            - plugin-ci/coverage
+            - build
+            - plugin-ci/test
