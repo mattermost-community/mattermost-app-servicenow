@@ -6,6 +6,11 @@ import (
 	"github.com/mattermost/mattermost-app-servicenow/goapp"
 )
 
+const (
+	FieldShortDescription = "short_description"
+	FieldLongDescription  = "description"
+)
+
 type Tables map[string]Table
 
 type Table struct {
@@ -42,15 +47,16 @@ func GetTables(creq goapp.CallRequest) Tables {
 		DisplayName: "Incidents",
 		Fields: []*apps.Field{
 			{
-				Name:        "short_description",
+				Name:        FieldShortDescription,
+				Label:       FieldShortDescription,
 				ModalLabel:  "Short Description",
-				Label:       "short_description",
 				Type:        apps.FieldTypeText,
 				TextSubtype: apps.TextFieldSubtypeTextarea,
+				IsRequired:  true,
 			},
 			{
-				Name:        "description",
-				Label:       "description",
+				Name:        FieldLongDescription,
+				Label:       FieldLongDescription,
 				ModalLabel:  "Long Description",
 				Type:        apps.FieldTypeText,
 				TextSubtype: apps.TextFieldSubtypeTextarea,
