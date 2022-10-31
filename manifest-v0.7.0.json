@@ -1,6 +1,6 @@
 {
     "app_id": "servicenow",
-    "version": "0.3.3",
+    "version": "0.3.4",
     "display_name": "ServiceNow (deprecated)",
     "description": "Do not install. This integration is for existing users only. Check back soon because a terrific new ServiceNow Integration is on it's way!",
     "homepage_url": "https://github.com/mattermost/mattermost-app-servicenow",
