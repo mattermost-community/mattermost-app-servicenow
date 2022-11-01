@@ -132,9 +132,9 @@ endif
 .PHONY: dist-plugin
 dist-plugin:	server webapp bundle
 
-## Builds and bundles the plugin, Mattermost cloud, and AWS Lambda.
+## Builds and bundles the plugin and AWS Lambda.
 .PHONY: dist
-dist:	dist-plugin dist-cloud dist-aws
+dist:	dist-plugin dist-aws
 
 ## Builds and installs the plugin to a server.
 .PHONY: deploy
